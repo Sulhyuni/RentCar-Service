@@ -1,0 +1,115 @@
+package com.ezenrent.member.dao;
+
+import java.util.List;
+
+import com.ezenrent.member.vo.LoginVO;
+import com.ezenrent.member.vo.MemberVO;
+import com.ezenrent.util.db.DAO;
+import com.ezenrent.util.db.DB;
+
+public class MemberDAOImpl extends DAO implements MemberDAO {
+
+
+	@Override
+	public LoginVO login(LoginVO vo) throws Exception {
+		LoginVO loginVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " select m.id, m.name, m.email, m.gradeNo, g.gradeName "
+					+ " from member m, grade g "
+					+ " where (m.id = ? and m.pw = ?) and (m.gradeNo = g.gradeNo)";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getPw());
+			System.out.println("4. 실행객체 & 데이터 담기");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행");
+			
+			if(rs != null && rs.next()) {
+				loginVO = new LoginVO();
+				loginVO.setId(rs.getString("id"));
+				loginVO.setName(rs.getString("name"));
+				loginVO.setEmail(rs.getString("email"));
+				loginVO.setGradeNo(rs.getInt("gradeNo"));
+				loginVO.setGradeName(rs.getString("gradeName"));
+			}
+			System.out.println("6. 저장 - loginVO : " + loginVO);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return loginVO;
+	} // end of login()
+
+	@Override
+	public List<MemberVO> list() throws Exception {
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return null;
+	} // end of list()
+
+	@Override
+	public MemberVO view(String str) throws Exception {
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return null;
+	} // end of view()
+
+	@Override
+	public Integer write(MemberVO vo) throws Exception {
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return null;
+	} // end of write()
+
+	@Override
+	public Integer update(MemberVO vo) throws Exception {
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return null;
+	} // end of update()
+
+	@Override
+	public Integer delete(MemberVO vo) throws Exception {
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return null;
+	} // end of delete()
+} // end of class

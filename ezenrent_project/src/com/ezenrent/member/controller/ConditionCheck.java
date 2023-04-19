@@ -1,0 +1,223 @@
+package com.ezenrent.member.controller;
+
+import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.regex.Pattern;
+
+public class ConditionCheck {
+	
+	// 길이 범위 확인 하기
+	public static boolean length(String str, int min, int max) {
+		return min <= str.length() && str.length() <= max;
+	}
+
+	// 아이디 형식 체크
+	public static boolean checkId(String id) {	
+		if(!length(id, 4, 20)) {
+			System.out.println("\n ✖ 아이디는 4자 이상 20자 이하로 입력 가능 합니다.");
+			return false;
+		} else if (!isEng(id.charAt(0))) {
+			System.out.println("\n ✖ 첫 글자는 영문 대소문자로 입력 가능 합니다.");
+			return false;
+		} else if (possibleEngNum(id)) {
+			System.out.println("\n ✖ 아이디는 영문 또는 숫자만 입력 가능 합니다.");
+			return false;
+		} else {
+			return true;
+		}
+	
+	} // end of checkId
+	
+	// 비밀번호 형식 체크
+	public static boolean checkPw(String pw) {
+		if(!length(pw, 10, 20)) {
+			System.out.println("\n ✖ 비밀번호는 10자 이상 20자 이하로 입력 가능 합니다.");
+			return false;
+		} else if (!hasNum(pw) || !hasEng(pw)) {
+			System.out.println("\n ✖ 영문과 숫자를 모두 포함 해 입력 해 주세요.");
+			return false;
+		} else if (!hasSpecialCh(pw)){
+			System.out.println("\n ✖ 사용 가능한 특수문자를 포함하여 입력 해 주세요.");
+			return false;
+		}
+		return true;
+	} // end of checkPw
+	
+	// 이름 형식 체크
+	public static boolean checkName(String name) {
+		if(!length(name, 2, 10)) {
+			System.out.println("\n ✖ 2자 이상 10자 이하로 입력 가능합니다.");
+			return false;
+		} else if (possibleKorEng(name)) {
+			System.out.println("\n ✖ 이름은 한글 또는 영문만 입력 가능 합니다.");
+			return false;
+		}
+		return true;
+	} // end of checkName
+	
+	// 생년월일 형식 체크
+	public static boolean checkBirth(String date) {
+		try {
+			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.parse(date);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	} // end of checkBirth
+	
+	// 19세 미만 아닌지 확인
+	public static Integer getAge(String birth) {
+		LocalDate birthDate = LocalDate.parse(birth, DateTimeFormatter.ISO_DATE);
+		int birthYear = birthDate.getYear();
+		LocalDate now = LocalDate.now();
+		int currentYear = now.getYear();		
+		return (currentYear - birthYear + 1);
+	} // end of getAge()
+	
+	// 성별 형식 체크
+	public static boolean checkGender(String gender) {
+		if (gender.equals("여자")|| gender.equals("남자")) {
+			return true;
+		} else {
+			return false;
+		}
+	} // end of checkGender
+	
+	// 회원 등급 체크
+	public static boolean checkGradeNo(String no) {
+		if (no.equals("1") || no.equals("9")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	// 회원 상태 형식 체크
+	public static boolean checkGradeName(String gender) {
+		if (gender.equals("정상")|| gender.equals("강퇴") || gender.equals("탈퇴") || gender.equals("휴면")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	// 휴대폰번호 형식 체크
+	public static boolean checkTel(String tel) {
+		if (!(Pattern.matches("^\\d{2,3}-\\d{3,4}-\\d{4}$", tel))) {
+			return false;
+		} else {
+			return true;
+		}
+	} // end of checkTel
+	
+	// 이메일 형식 체크
+	public static boolean checkEmail(String email) {
+		if(!(Pattern.matches("^[0-9a-zA-Z]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$", email))) {
+			return false;
+		} else {
+			return true;
+		}
+		
+	} // end of checkEmail
+	
+	// 면허번호 형식 체크
+	public static boolean checkLicenseNo(String LicenseNo) {
+		if(!(Pattern.matches("^\\d{2}-\\d{2}-\\d{6}-\\d{2}$", LicenseNo))) {
+			return false;
+		} else {
+			return true;
+		}
+	} // end of LicenseNo
+	
+	// 알파벳인지 확인
+	public static boolean isEng(char ch) {
+		return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z');
+	}
+	
+	// 한글인지 확인
+	public static boolean isKor(char ch) {
+		return '가' <= ch && ch <= '힣';
+	}
+	// 숫자인지 확인
+	public static boolean isNum(char ch) {
+		return '0' <= ch && ch <= '9';
+	}
+	// 특수문자인지 확인
+	public static boolean isSpecialChar(char ch) {
+		return ch == '~' || ch == '!' || ch == '@' || ch == '^' || ch == '*' ||
+			ch == '-' || ch == '_' || ch == '.' || ch == ',' || ch == '?';
+	}
+	// 숫자 포함했는지
+	public static boolean hasNum(String str) {
+		 for(int i = 0; i < str.length(); i++) {
+			 if(isNum(str.charAt(i))) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	// 영어 포함했는지
+	public static boolean hasEng(String str) {
+		for(int i = 0; i < str.length(); i++) {
+			 if(isEng(str.charAt(i))) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	// 특수문자 포함했는지
+	public static boolean hasSpecialCh(String str) {
+		for (int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			if(isSpecialChar(ch)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	//한글,영어 제외 다른 문자가 있으면 안됨 - 이름
+	public static boolean possibleKorEng(String str) {
+		for(int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			 if(!isKor(ch) && !isEng(ch)) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	// 영어,숫자 제외 다른 문자가 있으면 안됨 - 아이디
+	public static boolean possibleEngNum(String str) {
+		for(int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			 if(!isEng(ch) && !isNum(ch)) {
+				 return true;
+			 }
+		 }
+		 return false;
+	} // end of possibleEngNum()
+	
+	public static String randomPw() {
+		// 생성할 비밀번호 글자 세팅
+		char[] charSet = new char[] {
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                '~', '!', '@', '^', '*', '-', '_', '.', ',', '?'};
+		StringBuffer sb = new StringBuffer();
+		SecureRandom sr = new SecureRandom(); // 예측할 수 없는 seed를 이용하여 강력한 난수 생성. 보안에 강함.
+		sr.setSeed(new Date().getTime()); // 시간을 이용하여 난수 생성. 동일한 시간에 사용하면 동일한 값이 리턴 됨.
+		
+		int idx = 0;
+		int len = charSet.length;
+		for (int i = 0; i<10; i++) { // 비밀번호 입력 시 10자 이상으로 조건을 걸었기 때문에 임시 비번도 10자로 설정
+			idx = sr.nextInt(len); // 강력한 난수를 발생시키기 위해 SecureRandom을 사용.
+			sb.append(charSet[idx]); // 배열 만들어서 하나씩 담음.
+		}	
+		return sb.toString(); // String 타입으로 반환
+	}	
+} // end of class

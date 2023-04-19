@@ -1,0 +1,235 @@
+package com.ezenrent.review.dao;
+
+import java.awt.dnd.DropTargetContext;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ezenrent.review.vo.ReviewVO;
+import com.ezenrent.util.db.DAO;
+import com.ezenrent.util.db.DB;
+
+public class ReviewDAOImpl extends DAO implements ReviewDAO {
+	// 리뷰 리스트
+	@Override
+	public List<ReviewVO> list() throws Exception {
+		List<ReviewVO> list = null;
+
+		try {
+			// 1. 확인
+			con = DB.getConnection();
+			System.out.println("1. 드라이버 확인 2. 연결");
+			// 3. sql
+			String sql = " select r.reNo, r.carModel, r.title, r.id, to_char(r.reviewDate, 'yyyy-mm-dd') reviewDate, "
+					+ " r.hit, r.levNo " + " from review r, member m where m.id = r.id "
+					+ " order by refNo desc, ordNo ";
+			System.out.println("3. sql - " + sql);
+			// 4. 실행객체 & 데이터세팅
+			pstmt = con.prepareStatement(sql);
+			System.out.println("4. 실행객체 & 데이터 세팅");
+			// 5. 실행
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행");
+			// 6. 데이터 저장 또는 표시
+			if (rs != null) {
+				while (rs.next()) {
+					if (list == null)
+						list = new ArrayList<>();
+					ReviewVO vo = new ReviewVO();
+					vo.setReNo(rs.getLong("reNo"));
+					vo.setCarModel(rs.getString("carModel"));
+					vo.setTitle(rs.getString("title"));
+					vo.setId(rs.getString("id"));
+					vo.setReviewDate(rs.getString("reviewDate"));
+					vo.setHit(rs.getLong("hit"));
+					vo.setLevNo(rs.getLong("levNo"));
+
+					list.add(vo);
+				} // end of while
+				System.out.println("6. 데이터 저장 또는 표시");
+			} // end of if
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("리뷰 리스트 DB 처리 중 오류 발생");
+		} finally {
+			// 7. 닫기
+			DB.close(con, pstmt, rs);
+			System.out.println("7. 닫기");
+		} // end of finally
+		return list;
+	}// end of list
+	
+    // 리뷰 보기
+   	@Override
+	public ReviewVO view(long reNo) throws Exception {
+		System.out.println("ReviewDAOImpl.view().no : " + reNo + "=======================");
+		ReviewVO vo = null;
+		try {
+			// 1. 확인 2. 연결
+			con = DB.getConnection();
+			System.out.println("1. 확인 + 2. 연결");
+			// 3. sql
+			String sql = " select r.reNo, r.carModel, r.carFuel, r.carType," 
+					+ " r.rentDate, r.returnDate, r.title, r.content, r.id, to_char(r.reviewDate, 'yyyy-mm-dd') reviewDate, r.hit, "
+					+ " r.refNo, r.ordNo, r.levNo "
+					+ " from review r, member m " + " where (reNo = ?) and (m.id = r.id) ";
+			System.out.println("3. sql - " + sql);
+			// 4. 실행객체 & 데이터세팅
+			pstmt = con.prepareStatement(sql);
+			pstmt.setLong(1, reNo);
+			System.out.println("4. 실행객체 & 데이터세팅");
+			// 5. 실행
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행");
+			// 6. 데이터 저장 또는 표시
+			if(rs != null && rs.next()) {
+				vo = new ReviewVO();
+				vo.setReNo(rs.getLong("reNo"));
+				vo.setCarModel(rs.getString("carModel"));
+				vo.setCarFuel(rs.getString("carFuel"));
+				vo.setCarType(rs.getString("carType"));
+				vo.setRentDate(rs.getString("rentDate"));
+				vo.setReturnDate(rs.getString("returnDate"));
+				vo.setTitle(rs.getString("title"));
+				vo.setContent(rs.getString("content"));
+				vo.setId(rs.getString("id"));
+				vo.setReviewDate(rs.getString("reviewDate"));
+				vo.setHit(rs.getLong("hit"));
+				vo.setRefNo(rs.getLong("refNo"));
+				vo.setOrdNo(rs.getLong("ordNo"));
+				vo.setLevNo(rs.getLong("levNo"));
+			}// end of if
+			System.out.println("6. 데이터 저장 또는 표시");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("리뷰 보기 DB 처리 중 오류가 발생되었습니다. ");
+		}finally {
+			// 7. 닫기
+			DB.close(con, pstmt, rs);
+			System.out.println("7. 닫기");
+		}// end of finally
+		return vo;
+	}// end of view()
+
+   	// 조회수 1증가
+   	public int increase(long reNo) throws Exception{
+   		System.out.println("ReviewDAOImpl.increase()======================");
+   		int result = 0;
+   		try {
+			// 1. 확인 2. 연결
+   			con = DB.getConnection();
+   			System.out.println("1. 확인 + 2. 연결");
+   			// 3. sql
+   			String sql = " update review set hit = hit + 1 where reNo = ? ";
+   			System.out.println("3. sql - " + sql);
+   			// 4. 실행객체 & 데이터 세팅
+   			pstmt = con.prepareStatement(sql);
+   			pstmt.setLong(1, reNo);
+   			System.out.println("4. 실행객체");
+   			// 5. 실행
+   			result = pstmt.executeUpdate();
+   			System.out.println("5. 실행 - result : " + result );
+   			// 6. 데이터 저장 또는 표시
+   			if(result == 1) System.out.println("6. 데이터 저장 또는 표시 : 조회수 1 증가");
+   			else throw new Exception("조회수 1증가 실패");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			throw new Exception("리뷰글 조회수 1증가 DB 처리 중 오류가 발생되었습니다.");
+		}finally {
+			// 7. 닫기
+			DB.close(con, pstmt);
+			System.out.println("7. 닫기");
+			}// end of try~ catch finally
+		return result;
+   	}// end of inrease()
+   	
+   	// 리뷰쓰기
+	@Override
+	public Integer write(ReviewVO vo) throws Exception {
+		System.out.println("ReviewDAOImpl.write().vo : " + vo + "=============");
+		int result = 0;
+		try {
+			// 1. 확인 2. 연결
+			con = DB.getConnection();
+			System.out.println("1. 확인 + 2. 연결");
+			// 3. sql
+			String sql = " insert into review(reNo, carModel, carFuel, carType, " 				
+	+ "  rentDate, returnDate, title, content, id, refNo, ordNo, levNo, parentNo) "
+	+ " values(review_seq.nextval, ?, ?, ?, ?, ?, ?, ?, ?, review_seq.nextval, 1, 0, null )";
+			System.out.println("3. sql - " + sql);
+			// 4. 실행객체 & 데이터 세팅
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getCarModel());
+			pstmt.setString(2, vo.getCarFuel());
+			pstmt.setString(3, vo.getCarType());
+			pstmt.setString(4, vo.getRentDate());
+			pstmt.setString(5, vo.getReturnDate());
+			pstmt.setString(6, vo.getTitle());
+			pstmt.setString(7, vo.getContent());
+			pstmt.setString(8, vo.getId());
+			System.out.println("4. 실행객체 & 데이터 세팅");
+			// 5. 실행
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행 - result : " + result);
+			// 6. 데이터 저장 또는 표시
+			if(result == 1)
+				System.out.println("6. 데이터 저장 또는 표시 - 리뷰 등록이 되었습니다.");
+			else throw new Exception("리뷰 등록이 실패했습니다");
+		}catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			throw new Exception("리뷰등록 DB 처리 중 오류가 발생되었습니다");
+		}finally {
+			// 7. 닫기
+			DB.close(con, pstmt);
+		}
+		return result;
+	}// end of write
+    
+	// 리뷰 수정
+	@Override
+	public Integer update(ReviewVO vo) throws Exception {
+		System.out.println("ReviewDAOImpl.update().vo : " + vo + "=====================");
+		Integer result = 0;
+		try {
+			// 1. 확인 2. 연결
+			con = DB.getConnection();
+			System.out.println("1. 확인 + 2. 연결");
+			// 3. sql
+			String sql = " update review set title =? , content = ? "
+					+ " where reNo = ? and id >= ? ";
+			System.out.println("3. sql - " + sql);
+			// 4. 실행객체 & 데이터 세팅
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getTitle());
+			pstmt.setString(2, vo.getContent());
+			pstmt.setLong(3, vo.getReNo());
+			pstmt.setString(4, vo.getId());
+			System.out.println("4. 실행객체 + 데이터 세팅");
+			// 5. 실행
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			// 6. 데이터 저장 또는 표시
+			if(result == 1) System.out.println("6. 데이터 저장 또는 표시 - 글이 수정되었습니다.");
+			else { throw new Exception("6. 데이터 저장 또는 표시 - 선택한 글이 없거나 본인글이 아닙니다.");
+			}// end of else
+		}catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+	        throw new Exception("수정 작업 DB 처리 중 오류가 발생되었습니다.");
+		}finally {
+			// 7. 닫기
+			DB.close(con, pstmt);
+			System.out.println("7. 닫기");
+		}// end of finally
+		return result;
+	}// end of update
+	 
+	// 리뷰 삭제
+	@Override
+	public Integer delete(ReviewVO vo) throws Exception {
+		
+		return null;
+	}// end of delete
+
+}

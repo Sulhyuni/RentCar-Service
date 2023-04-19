@@ -1,0 +1,7 @@
+package com.ezenrent.member.controller;
+
+public class MemberController {
+	public void execute() {
+		
+	}
+}

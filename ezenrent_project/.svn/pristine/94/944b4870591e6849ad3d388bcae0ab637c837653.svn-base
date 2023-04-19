@@ -1,0 +1,13 @@
+package com.ezenrent.notice.service;
+
+import com.ezenrent.main.ServiceInterface;
+
+public class NoticeListServiceImpl implements ServiceInterface {
+
+	@Override
+	public Object service(Object obj) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

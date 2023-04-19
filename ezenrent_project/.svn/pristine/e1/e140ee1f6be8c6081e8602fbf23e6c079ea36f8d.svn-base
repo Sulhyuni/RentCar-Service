@@ -1,0 +1,5 @@
+package com.ezenrent.notice.dao;
+
+public class NoticeDAOImpl {
+
+}

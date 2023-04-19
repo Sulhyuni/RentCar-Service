@@ -1,0 +1,7 @@
+package com.ezenrent.member.dao;
+
+import com.ezenrent.member.vo.LoginVO;
+
+public interface MemberDAO {
+	public LoginVO login(LoginVO vo) throws Exception;
+}

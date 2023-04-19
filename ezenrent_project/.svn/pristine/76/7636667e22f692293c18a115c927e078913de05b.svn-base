@@ -1,0 +1,9 @@
+package com.ezenrent.car.controller;
+
+public class CarController {
+
+	public void execute() {
+
+	}
+
+}

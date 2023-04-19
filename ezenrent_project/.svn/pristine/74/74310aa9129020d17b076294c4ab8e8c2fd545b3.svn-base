@@ -1,0 +1,144 @@
+package com.ezenrent.member.controller;
+
+import java.util.List;
+
+import com.ezenrent.main.Execute;
+import com.ezenrent.main.Main;
+import com.ezenrent.member.service.MemberDeleteServiceImpl;
+import com.ezenrent.member.service.MemberListServiceImpl;
+import com.ezenrent.member.service.MemberUpdateServiceImpl;
+import com.ezenrent.member.service.MemberViewServiceImpl;
+import com.ezenrent.member.service.MemberWriteServiceImpl;
+import com.ezenrent.member.vo.MemberVO;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.MemberPrint;
+import com.ezenrent.util.io.Out;
+
+public class MemberController {
+	public void execute() {
+		while(true) {
+			try {
+				if(Main.login.getGradeNo() != 9) {
+					Out.error("=", 20, "관리자만 접근 가능합니다.");
+					return;
+				} else {
+					Out.title("=", 20, "회원관리");
+					System.out.println(" 1.회원리스트 2.회원정보보기 3.회원정보등록 4.회원정보수정 5.회원삭제 0.이전메뉴");
+					Out.line("=", 50);
+				}
+				
+				switch(In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+				case "1" : // 리스트
+					@SuppressWarnings("unchecked") 
+					List<MemberVO> list = (List<MemberVO>) Execute.run(new MemberListServiceImpl(), null);
+					MemberPrint.print(list);
+					break;
+				case "2" : // 보기
+					MemberVO viewVO = new MemberVO();
+					String str = In.getString("정보를 확인할 회원의 아이디를 입력 해 주세요.");
+					viewVO.setId(str);
+					viewVO = (MemberVO) Execute.run(new MemberViewServiceImpl(), str);
+					MemberPrint.print(viewVO);
+					break;
+				case "3" : // 등록
+					MemberVO writeVO = new MemberVO();
+					System.out.println("\n ▶ 가입 항목을 형식에 맞게 작성 해 주세요.");
+					System.out.println(" ▶ ※ 표시는 필수 입력 사항이며, 나머지는 선택 사항 입니다.");
+					writeVO.setId(In.getString(" ※ 아이디"));
+					writeVO.setPw(In.getString(" ※ 비밀번호"));
+					writeVO.setName(In.getString(" ※ 이름"));
+					writeVO.setBirth(In.getString(" ※ 생년월일 (yyyy-mm-dd)"));
+					writeVO.setGender(In.getString(" ※ 성별 (여자, 남자)"));
+					writeVO.setTel(In.getString(" ※ 연락처 (01x-xxxx-xxxx)"));
+					writeVO.setEmail(In.getString(" ※ 이메일 (nnn@nnn.nnn)"));
+					writeVO.setLicenseNo(In.getString(" 선택) 면허번호 (xx-xx-xxxxxx-xx)"));
+					int result = (int) Execute.run(new MemberWriteServiceImpl(), writeVO);
+					if(result == 1) {
+						System.out.println("\n ■ "+writeVO.getId()+"님, 환영합니다! 로그인 후 이용 해 주세요.");
+					} else {
+						System.out.println("\n ■ 가입이 되지 않았습니다.");
+						System.out.println(" ■ 누락된 항목이 있거나, 형식에 맞게 입력 하였는지 다시 한 번 확인 해 주세요.");
+					}
+					break;
+				case "4" : // 수정
+					MemberVO updateVO = new MemberVO();
+					str = In.getString("수정 할 회원의 아이디를 입력 해 주세요.");
+					updateVO.setId(str);
+					updateVO = (MemberVO) Execute.run(new MemberViewServiceImpl(), str);
+					MemberPrint.print(updateVO);
+					updateVO(updateVO);
+					result = (Integer) Execute.run(new MemberUpdateServiceImpl(), updateVO);
+					if (result == 1) {
+						System.out.println("\n 수정이 되었습니다.");
+					} else {
+						System.out.println("\n 수정이 되지 않았습니다.");
+					}
+					break;
+				case "5" : // 삭제
+					Execute.run(new MemberDeleteServiceImpl(), null);
+					break;
+				case "0" : // 이전메뉴 
+					return;
+				default :
+					System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+					System.out.println("■ 1~5번, 0번중에 선택 해 주세요. ");
+					break;
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} // end of try~catch
+		} // end of while
+	} // end of execute()
+	
+	public void writeVO(MemberVO vo) {
+		
+	}
+	
+	public void updateVO(MemberVO vo) {
+		while (true) {
+			if (Main.login.getGradeNo() == 1) {
+				Out.line("=", 30);
+				System.out.println(" 1.연락처 2.이메일 3.면허번호 0.수정완료");
+				Out.line("=", 30);
+				switch(In.getString("수정 할 항목을 선택 해 주세요.")) {
+				case "1" : // 연락처
+					vo.setTel(In.getString("수정 할 연락처 (01x-xxxx-xxxx)"));
+					break;
+				case "2" : // 이메일
+					vo.setEmail(In.getString("수정 할 이메일 (nnn@nnn.nnn)"));			
+					break;
+				case "3" : // 면허번호
+					vo.setLicenseNo(In.getString("면허번호 (xx-xx-xxxxxx-xx)"));			
+					break;
+				case "0" : // 수정완료
+					vo.setId(Main.login.getId());
+					return;
+				default :
+					System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+					System.out.println("■ 1~3번, 0번중에 선택 해 주세요. ");
+					break;
+				} // end of switch
+			} else if (Main.login.getGradeNo() == 9) {
+				Out.line("=", 30);
+				System.out.println(" 1.회원등급 2.회원상태 0.수정완료");
+				Out.line("=", 30);
+				switch(In.getString("수정 할 항목을 선택 해 주세요.")) {
+				case "1" :
+					vo.setGradeNo(Integer.parseInt(In.getString("등급 변경 (1,9)")));
+					break;
+				case "2" :
+					vo.setStatus(In.getString("상태 변경 (정상,휴면,강퇴,탈퇴)"));
+					break;
+				case "0" :
+					return;
+				default :
+					System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+					System.out.println("■ 1~2번, 0번중에 선택 해 주세요. ");
+					break;
+					
+				} // end of switch
+			} // end of if
+		} // end of while
+	} // end of updateVO()
+} // end of class

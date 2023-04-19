@@ -1,0 +1,23 @@
+
+package com.ezenrent.notice.service;
+
+import com.ezenrent.main.ServiceInterface;
+import com.ezenrent.notice.dao.NoticeDAO;
+import com.ezenrent.notice.dao.NoticeDAOImpl;
+
+public class NoticePreviewServiceImpl implements ServiceInterface{
+//현재공지 내용을 볼수있는 view
+	@Override
+	public Object service(Object obj) throws Exception {
+	//	System.out.println("NoticeViewServiceImpl.service()");
+		Object[]objs = (Object[]) obj;
+		long no = (long) objs[0];
+		int inc = (int) objs[1];
+	
+		NoticeDAO dao = new NoticeDAOImpl();
+		if(inc ==1)dao.increase(no);
+		return dao.preView(no);
+			
+	}
+
+}

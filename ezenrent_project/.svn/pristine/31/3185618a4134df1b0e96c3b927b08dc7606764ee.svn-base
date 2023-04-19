@@ -1,0 +1,45 @@
+package com.ezenrent.car.dao;
+
+import java.util.List;
+
+import com.ezenrent.car.vo.CarVO;
+
+public class CarDAOImpl implements CarDAO {
+
+	@Override
+	public List<CarVO> list() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<CarVO> posList() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CarVO view(long no) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int write(CarVO vo) throws Exception {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int update(CarVO vo) throws Exception {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int delete(CarVO vo) throws Exception {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

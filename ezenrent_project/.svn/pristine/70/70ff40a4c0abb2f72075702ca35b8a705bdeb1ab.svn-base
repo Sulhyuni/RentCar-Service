@@ -1,0 +1,67 @@
+package com.ezenrent.notice.controller;
+
+import com.ezenrent.main.Main;
+import com.ezenrent.member.vo.LoginVO;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.Out;
+
+
+
+public class NoticeController {
+	
+	
+	public static LoginVO login = null;
+	boolean isAdmin = Main.login != null && Main.login.getGradeNo() == 9;
+	public void execute() {
+		while (true) {
+			try {
+				//메뉴 출력
+				Out.title("-", 40, "공지 사항");
+				//메뉴 입력 및 처리
+				System.out.println((Main.login!=null)?"[1. 공지사항 리스트] [2.공지사항 보기] [0.이전메뉴] ":"");
+				System.out.print((Main.login.getGradeNo() == 9) ? "[3. 공지 등록][4 공지 수정][5.공지 삭제]" : "");
+				System.out.println();
+				
+				switch (In.getString("메뉴 입력")) {
+				case "1":
+					// 공지리스트 
+					
+					break;
+				case "2":
+					// 공지 보기 
+					
+					break;
+				case "0":// 이전메뉴 
+					System.out.println("이전메뉴로 돌아갑니다.");
+					
+					return;
+				case "3"://공지등록 
+					
+					break;
+				case "4"://공지 수정
+					
+					break;
+				case "5"://공지 삭제
+					
+					break;
+
+				default:
+					break;
+				}
+				
+				
+				
+
+			}
+
+			catch (Exception e) {
+				// 개발자를 위한 코드
+				e.printStackTrace();
+				// 사용자를 위한 코드
+				Out.error("*", 40, "로그인이 필요합니다. 4번 My 메뉴 >> 1.로그인을 해주세요.");
+
+			}
+		} // end of execute()
+
+	}
+}// end of NoticeController()

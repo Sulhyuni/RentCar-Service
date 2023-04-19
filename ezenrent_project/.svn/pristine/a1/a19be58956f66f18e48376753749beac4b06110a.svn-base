@@ -1,0 +1,18 @@
+
+package com.ezenrent.notice.service;
+
+import com.ezenrent.main.ServiceInterface;
+import com.ezenrent.notice.dao.NoticeDAO;
+import com.ezenrent.notice.dao.NoticeDAOImpl;
+
+public class NoticeReservationListServiceImpl implements ServiceInterface{
+
+	@Override
+	public Object service(Object obj) throws Exception {
+		
+	//		System.out.println("NoticeReservationListServiceImpl.service()");
+			NoticeDAO dao = new NoticeDAOImpl();
+			return dao.reservationList();
+		}
+			
+	}

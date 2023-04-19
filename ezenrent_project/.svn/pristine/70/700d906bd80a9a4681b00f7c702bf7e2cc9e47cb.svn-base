@@ -1,0 +1,5 @@
+package com.ezenrent.review.dao;
+
+public class ReviewDAOImpl {
+
+}

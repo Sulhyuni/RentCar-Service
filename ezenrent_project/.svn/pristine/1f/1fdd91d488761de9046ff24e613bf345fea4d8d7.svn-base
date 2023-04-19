@@ -1,0 +1,500 @@
+package com.ezenrent.member.dao;
+
+import java.util.ArrayList;
+import java.sql.Date;
+import java.util.List;
+import com.ezenrent.member.vo.LoginVO;
+import com.ezenrent.member.vo.MemberVO;
+import com.ezenrent.util.db.DAO;
+import com.ezenrent.util.db.DB;
+
+public class MemberDAOImpl extends DAO implements MemberDAO {
+
+	@Override
+	public LoginVO login(String id, String pw) throws Exception {
+		LoginVO loginVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " select m.id, m.name, m.email, m.gradeNo, g.gradeName, m.status, m.regDate "
+					+ " from member m, grade g "
+					+ " where (m.id = ? and m.pw = ?) and (m.gradeNo = g.gradeNo)";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, pw);
+			System.out.println("4. 실행객체 & 데이터 담기");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행");
+			
+			if(rs != null && rs.next()) {
+				loginVO = new LoginVO();
+				loginVO.setId(rs.getString("id"));
+				loginVO.setName(rs.getString("name"));
+				loginVO.setEmail(rs.getString("email"));
+				loginVO.setGradeNo(rs.getInt("gradeNo"));
+				loginVO.setGradeName(rs.getString("gradeName"));
+				loginVO.setStatus(rs.getString("status"));
+				loginVO.setRegDate(rs.getString("regDate"));
+			}
+			System.out.println("6. 저장 - loginVO : " + loginVO);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return loginVO;
+	} // end of login()
+
+	@Override
+	public List<MemberVO> list(MemberVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.list() 실행");
+		List<MemberVO> list = null;
+		
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			String condition = " ";
+			if(vo.getId() != null ) condition = "id =? and";
+			else if(vo.getName() != null ) condition = "name =? and";
+			else if(vo.getTel() != null ) condition = "tel LIKE ? and";
+			else if(vo.getStatus() != null) condition = "status = ? and";
+			String sql = " SELECT m.id, m.name, m.gender, m.tel, m.status, m.gradeNo, g.gradeName, m.regDate "
+					+ " FROM grade g, member m "
+					+ " WHERE " + condition + "(m.gradeNo = g.gradeNo) "
+					+ " ORDER BY id ASC";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			String data = null;
+			if(condition != " ") {
+				if(vo.getId() != null) data = vo.getId();
+				else if(vo.getName() != null) data = vo.getName();
+				else if(vo.getTel() != null) data = "%"+vo.getTel()+"%";
+				else if(vo.getStatus() != null) data = vo.getStatus();
+				pstmt.setString(1, data);
+			} 
+				System.out.println("4. 실행객체 & 데이터담기");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행");
+			
+			if(rs != null) {
+				while (rs.next()) {
+					if(list == null) list = new ArrayList<MemberVO>();
+				MemberVO listVO = new MemberVO();	
+				listVO.setId(rs.getString("id"));
+				listVO.setName(rs.getString("name"));
+				listVO.setGender(rs.getString("gender"));
+				listVO.setTel(rs.getString("tel"));
+				listVO.setStatus(rs.getString("status"));
+				listVO.setGradeNo(rs.getInt("gradeNo"));
+				listVO.setGradeName(rs.getString("gradeName"));
+				listVO.setRegDate(rs.getString("regDate"));
+				list.add(listVO);
+				}
+				
+				System.out.println("6. 데이터 저장 또는 표시");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return list;
+	} // end of list()
+
+	@Override
+	public MemberVO view(String str) throws Exception {
+		System.out.println("MemberDAOImpl.view() 실행");
+		MemberVO viewVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = "SELECT m.id, m.name, m. pw, m.gender, to_char(m.birth, 'yyyy-mm-dd') birth, "
+					+ " m.tel, m.email, m.licenseNo, to_char(m.regDate, 'yyyy-mm-dd HH24:MI:SS') regDate, m.status, m.gradeNo, g.gradeName "
+					+ " FROM grade g, member m "
+					+ " WHERE id = ? and (m.gradeNo = g.gradeNo) ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, str);
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행 - rs : "  + rs);
+			
+			if(rs != null && rs.next()) {
+				viewVO = new MemberVO();
+				viewVO.setId(rs.getString("id"));
+				viewVO.setName(rs.getString("name"));
+				viewVO.setPw(rs.getString("pw"));
+				viewVO.setGender(rs.getString("gender"));
+				viewVO.setBirth(rs.getString("birth"));
+				viewVO.setTel(rs.getString("tel"));
+				viewVO.setEmail(rs.getString("email"));
+				viewVO.setLicenseNo(rs.getString("licenseNo"));
+				viewVO.setRegDate(rs.getString("regDate"));
+				viewVO.setStatus(rs.getString("status"));
+				viewVO.setGradeNo(rs.getInt("gradeNo"));
+				viewVO.setGradeName(rs.getString("gradeName"));
+			}
+			System.out.println("6. 데이터 저장 또는 표시");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return viewVO;
+	} // end of view()
+	
+	public MemberVO viewPw(String pw) throws Exception {
+		System.out.println("MemberDAOImpl.viewPw() 실행");
+		MemberVO viewPwVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = "SELECT pw"
+					+ " FROM member "
+					+ " WHERE id = ? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, pw);
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행 - rs : "  + rs);
+			
+			if(rs != null && rs.next()) {
+				viewPwVO = new MemberVO();
+				viewPwVO.setPw(rs.getString("pw"));
+			}
+			System.out.println("6. 데이터 저장 또는 표시");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return viewPwVO;
+	} // end of viewPw()
+
+	@Override
+	public Integer write(MemberVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.write() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " INSERT INTO member (id, pw, name, gender, birth, tel, email, licenseNo) "
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getPw());
+			pstmt.setString(3, vo.getName());
+			pstmt.setString(4, vo.getGender());
+			pstmt.setString(5, vo.getBirth());
+			pstmt.setString(6, vo.getTel());
+			pstmt.setString(7, vo.getEmail());
+			pstmt.setString(8, vo.getLicenseNo());			
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			
+			if(result == 1) {
+				System.out.println("6. 데이터 저장 또는 표시 - 회원 등록 성공");
+			} else {
+				throw new Exception("6. 회원 등록 실패");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	} // end of write()
+
+	@Override
+	public Integer update(MemberVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.update() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " update member set "
+					+ " tel =?, email=?, licenseNo=?, gradeNo=?, status =?, "
+					+ " regdate = ? "
+					+ " where id =? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getTel());
+			pstmt.setString(2, vo.getEmail());
+			pstmt.setString(3, vo.getLicenseNo());
+			pstmt.setInt(4, vo.getGradeNo());
+			pstmt.setString(5, vo.getStatus());
+			pstmt.setString(6, vo.getRegDate());
+			pstmt.setString(7, vo.getId());
+
+			
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			
+			if(result == 1) {
+				System.out.println("6. 데이터 저장 또는 표시 - 회원정보수정 성공");
+			} else {
+				throw new Exception("6. 회원정보수정 실패 ");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	} // end of update()
+	
+	public Integer updatePw(MemberVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.updatePw() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " update member set "
+					+ " pw = ? "
+					+ " where id =? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getPw());
+			pstmt.setString(2, vo.getId());
+			
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			
+			if(result == 1) {
+				System.out.println("6. 데이터 저장 또는 표시 - 회원정보수정 성공");
+			} else {
+				throw new Exception("6. 회원정보수정 실패");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	} // end of updatePw()
+	
+	public Integer updateDate(String str) throws Exception {
+		System.out.println("MemberDAOImpl.updateDate() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " update member set "
+					+ " regdate = sysdate "
+					+ " where id = ? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);	
+			pstmt.setString(1, str);
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			
+			if(result == 1) {
+				System.out.println("6. 데이터 저장 또는 표시 - 최근접속일 업데이트 성공");
+			} else {
+				throw new Exception("6. 최근접속일 업데이트 실패");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	}
+
+	public Integer rest(Date date) throws Exception {
+//		System.out.println("MemberDAOImpl.rest() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+//			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " update member set "
+					+ " status =  '휴면' "
+					+ " where regdate < ? and status = '정상' ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);	
+			pstmt.setDate(1, date);
+
+//			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+//			System.out.println("5. 실행");
+			
+//			if(result == 1) {
+//				System.out.println("6. 데이터 저장 또는 표시 - 휴면 해제 성공");
+//			} else {
+//				throw new Exception("6. 휴면 해제 실패");
+//			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	} // end of rest()
+	
+	public Integer wakeUp(MemberVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.WakeUp() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " update member set "
+					+ " status =  '정상' "
+					+ " where id = ? and name =? and pw =? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);	
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getName());
+			pstmt.setString(3, vo.getPw());
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			
+			if(result == 1) {
+				System.out.println("6. 데이터 저장 또는 표시 - 휴면 해제 성공");
+			} else {
+				throw new Exception("6. 휴면 해제 실패");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	}
+	
+	@Override
+ 	public Integer delete(String str) throws Exception {
+		System.out.println("MemberDAOImpl.delete() 실행");
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " delete from member "
+					+ " where id = ? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, str);
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");
+			
+			if(result == 1) {
+				System.out.println("6. 데이터 저장 또는 표시 - 회원 삭제 성공");
+			} else {
+				throw new Exception("6.회원 삭제 실패");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt);
+		}
+		return result;
+	} // end of delete()
+	
+	public LoginVO findId(LoginVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.findId() 실행");
+		LoginVO findIdVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " select id from member where name =? and email = ? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getName());
+			pstmt.setString(2, vo.getEmail());
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행 - rs : "  + rs);
+			
+			if(rs != null && rs.next()) {
+				findIdVO = new LoginVO();
+				findIdVO.setId(rs.getString("id"));
+			}
+			System.out.println("6. 데이터 저장 또는 표시");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return findIdVO;
+	} // end of findId()
+	
+	public MemberVO findPw(MemberVO vo) throws Exception {
+		System.out.println("MemberDAOImpl.findPw() 실행");
+		MemberVO findPwVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = " select pw from member where id=? and name =? and email = ? ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getName());
+			pstmt.setString(3, vo.getEmail());
+			System.out.println("4. 실행객체 + 데이터세팅");
+			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행 - rs : "  + rs);
+			
+			if(rs != null && rs.next()) {
+				findPwVO = new MemberVO();
+				findPwVO.setPw(rs.getString("pw"));
+			}
+			System.out.println("6. 데이터 저장 또는 표시");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+		return findPwVO;
+	} // end of findPw()
+
+	
+	
+} // end of class

@@ -1,0 +1,77 @@
+package com.ezenrent.util.io;
+
+import java.util.List;
+
+import com.ezenrent.rent.vo.RentVO;
+
+public class RentPrint {
+	
+	// list
+	//일반회원일경우 본인 리스트만 보인다.
+	
+	//관리자- 모든회원의 대여리스트 확인가능하다.
+		public static void print(List<RentVO> list) {
+			System.out.println("\n--------------------------------------------------");
+			System.out.println(" 예약번호(rentNo)|차량번호(carNo)| Id |이름|연락처|회사명|모델명|옵션|대여시작일|대여반납일|추가운전자|대여장소|대여상태");
+			System.out.println("--------------------------------------------------");
+
+			if (list == null || list.size() == 0) {
+				System.out.println("**예약된 내역이 존재하지 않습니다.**"
+						+ "\n ** 3.예약하기 이용해주세요 **");
+				System.out.println("--------------------------------------------------");
+				return;
+			} // if 끝
+
+			for (RentVO vo : list) {
+				System.out.print(" " + vo.getRentNo());
+				System.out.print(" |" + vo.getCarNo());
+				System.out.print(" |" + vo.getId());
+				System.out.print(" |" + vo.getName());
+				System.out.print(" |" + vo.getTel());
+				System.out.print(" |" + vo.getCarBrand());
+				System.out.print(" |" + vo.getCarModel());
+				System.out.print(" |" + vo.getCarOption());
+				System.out.print(" |" + vo.getRentalDate());
+				System.out.print(" |" + vo.getReturnDate());
+				System.out.print(" |" + vo.getAddDriver());
+				System.out.print(" |" + vo.getPlace());
+				System.out.print(" |" + vo.getCarStatus());
+				System.out.println();
+
+			} // for 끝
+			System.out.println("--------------------------------------------------");
+		}// list print 끝
+
+		// view
+		//상세내역
+
+		public static void print(RentVO vo) {
+			if (vo == null) {
+				System.out.println("**예약된 내역이 존재하지 않습니다.**"
+						+ "\n ** 3.예약하기 이용해주세요 **");
+				System.out.println("--------------------------------------------------");
+				return;
+			} // if 끝
+			System.out.println("--------------------------------------------------");
+			
+			System.out.println(" - 예약번호 : " + vo.getRentNo());
+			System.out.println(" - 차량번호 : " + vo.getCarNo());
+			System.out.println(" - ID : " + vo.getId());
+			System.out.println(" - 이름 : " + vo.getName());
+			System.out.println(" - 연락처 : " + vo.getTel());
+			System.out.println(" - 제조사 : " + vo.getCarBrand());
+			System.out.println(" - 모델명 : " + vo.getCarModel());
+			System.out.println(" - 타입 : " + vo.getCarType());
+			System.out.println(" - 타입 : " + vo.getCarOption());
+			System.out.println(" - 연료 : " + vo.getCarFuel());
+			System.out.println("--------------------------------------------------");
+			System.out.println(" - 렌트료 : " + vo.getTotalFee());
+			System.out.println(" - 보험상세 : " + vo.getInsurance());
+			System.out.println(" - 대여일자 : " + vo.getRentalDate());
+			System.out.println(" - 반납일자 : " + vo.getReturnDate());
+			System.out.println(" - 추가운전자 : " + vo.getAddDriver());
+			System.out.println(" - 대여/반납장소 : " + vo.getPlace());
+			System.out.println("--------------------------------------------------");
+		}
+
+}

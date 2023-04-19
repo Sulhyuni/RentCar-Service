@@ -1,0 +1,54 @@
+package com.ezenrent.util.io;
+
+import java.util.List;
+
+import com.ezenrent.car.vo.CarVO;
+
+public class CarPrint {
+
+	// 차량 리스트
+	public static void print(List<CarVO> list) throws Exception {
+
+		if (list == null || list.size() == 0)
+			System.out.println("데이터가 없습니다");
+
+		Out.line("=", 66);
+		System.out.println("번호 | 대여 여부 | 차종 | 회사명 | 차량명 | 좌석 | 연식 | 일일 대여비");
+		Out.line("=", 66);
+
+		for (CarVO vo : list) {
+			System.out.print(" " + vo.getCarNo());
+			System.out.print(" | " + vo.getCarStatus());
+			System.out.print(" | " + vo.getCarType());
+			System.out.print(" | " + vo.getCarBrand());
+			System.out.print(" | " + vo.getCarModel());
+			System.out.print(" | " + vo.getCarSeat());
+			System.out.print(" | " + vo.getCarYear());
+			System.out.print(" | " + vo.getCarPrice());
+			System.out.println();
+		}
+		Out.line("=", 66);
+
+	}
+
+	// 차량 상세 보기
+	public static void print(CarVO vo) throws Exception {
+		Out.line("=", 45);
+		if (vo == null)
+			throw new Exception("데이터가 존재하지 않습니다");
+
+		Out.line("=", 45);
+		System.out.println("- 번호: " + vo.getCarNo());
+		System.out.println("- 대여 여부: " + vo.getCarStatus());
+		System.out.println("- 차종: " + vo.getCarType());
+		System.out.println("- 회사명: " + vo.getCarBrand());
+		System.out.println("- 차량명: " + vo.getCarModel());
+		System.out.println("- 좌석: " + vo.getCarSeat());
+		System.out.println("- 연식: " + vo.getCarYear());
+		System.out.println("- 일일 대여비: " + vo.getCarPrice());
+		System.out.println("- 연료: " + vo.getCarFuel());
+		System.out.println("- 옵션: " + vo.getCarOption());
+
+	}
+
+}

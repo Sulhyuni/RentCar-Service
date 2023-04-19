@@ -1,0 +1,9 @@
+package com.ezenrent.review.controller;
+
+public class ReviewController {
+	
+	public void execute() {
+		
+	}//end of execute()
+
+}// end of ReviewController class

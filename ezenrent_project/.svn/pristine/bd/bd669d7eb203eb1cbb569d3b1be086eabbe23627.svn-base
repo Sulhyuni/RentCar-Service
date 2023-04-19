@@ -1,0 +1,151 @@
+package com.ezenrent.rent.vo;
+
+public class RentVO {
+	
+	private long rentNo,carNo,addNo,totalFee,carPrice,insurance;
+	private String carModel,carType,carFuel, carOption, carBrand,  id, name, 
+	tel, rentalDate, returnDate,addDriver,place,addBirth,addLicense,carStatus;
+	public long getRentNo() {
+		return rentNo;
+	}
+	public void setRentNo(long rentNo) {
+		this.rentNo = rentNo;
+	}
+	public long getCarNo() {
+		return carNo;
+	}
+	public void setCarNo(long carNo) {
+		this.carNo = carNo;
+	}
+	public long getAddNo() {
+		return addNo;
+	}
+	public void setAddNo(long addNo) {
+		this.addNo = addNo;
+	}
+	public long getTotalFee() {
+		return totalFee;
+	}
+	public void setTotalFee(long totalFee) {
+		this.totalFee = totalFee;
+	}
+	public long getCarPrice() {
+		return carPrice;
+	}
+	public void setCarPrice(long carPrice) {
+		this.carPrice = carPrice;
+	}
+	public String getCarModel() {
+		return carModel;
+	}
+	public void setCarModel(String carModel) {
+		this.carModel = carModel;
+	}
+	public String getCarType() {
+		return carType;
+	}
+	public void setCarType(String carType) {
+		this.carType = carType;
+	}
+	public String getCarFuel() {
+		return carFuel;
+	}
+	public void setCarFuel(String carFuel) {
+		this.carFuel = carFuel;
+	}
+	public String getCarOption() {
+		return carOption;
+	}
+	public void setCarOption(String carOption) {
+		this.carOption = carOption;
+	}
+	public String getCarBrand() {
+		return carBrand;
+	}
+	public void setCarBrand(String carBrand) {
+		this.carBrand = carBrand;
+	}
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	public String getRentalDate() {
+		return rentalDate;
+	}
+	public void setRentalDate(String rentalDate) {
+		this.rentalDate = rentalDate;
+	}
+	public String getReturnDate() {
+		return returnDate;
+	}
+	public void setReturnDate(String returnDate) {
+		this.returnDate = returnDate;
+	}
+	public String getAddDriver() {
+		return addDriver;
+	}
+	public void setAddDriver(String addDriver) {
+		this.addDriver = addDriver;
+	}
+	public long getInsurance() {
+		return insurance;
+	}
+	public void setInsurance(long insurance) {
+		this.insurance = insurance;
+	}
+	public String getPlace() {
+		return place;
+	}
+	public void setPlace(String place) {
+		this.place = place;
+	}
+	public String getAddBirth() {
+		return addBirth;
+	}
+	public void setAddBirth(String addBirth) {
+		this.addBirth = addBirth;
+	}
+	public String getAddLicense() {
+		return addLicense;
+	}
+	public void setAddLicense(String addLicense) {
+		this.addLicense = addLicense;
+	}
+	public String getCarStatus() {
+		return carStatus;
+	}
+	public void setCarStatus(String carStatus) {
+		this.carStatus = carStatus;
+	}
+	@Override
+	public String toString() {
+		return "RentVO [rentNo=" + rentNo + ", carNo=" + carNo + ", addNo=" + addNo + ", totalFee=" + totalFee
+				+ ", carPrice=" + carPrice + ", carModel=" + carModel + ", carType=" + carType + ", carFuel=" + carFuel
+				+ ", carOption=" + carOption + ", carBrand=" + carBrand + ", id=" + id + ", name=" + name + ", tel="
+				+ tel + ", rentalDate=" + rentalDate + ", returnDate=" + returnDate + ", addDriver=" + addDriver
+				+ ", insurance=" + insurance + ", place=" + place + ", addBirth=" + addBirth + ", addLicense="
+				+ addLicense + ", carStatus=" + carStatus + "]";
+	}
+	
+	
+	
+	
+	
+	
+	
+
+}

@@ -1,0 +1,24 @@
+package com.ezenrent.member.controller;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import com.ezenrent.main.Execute;
+import com.ezenrent.member.service.MemberRestServiceImpl;
+
+public class MemberThread implements Runnable{
+
+	@Override
+	public void run() {
+		while(true) {
+			try {
+				LocalDateTime now = LocalDateTime.now();
+				LocalDateTime oneYearsAgo = now.minusYears(1);
+				String format = oneYearsAgo.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+				Execute.run(new MemberRestServiceImpl(), format);
+				Thread.sleep(1000 * 60 * 1);			
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}

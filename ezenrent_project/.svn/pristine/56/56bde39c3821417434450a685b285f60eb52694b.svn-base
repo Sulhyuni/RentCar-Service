@@ -1,0 +1,5 @@
+package com.ezenrent.review.service;
+
+public class ReviewDeleteServiceImpl {
+
+}

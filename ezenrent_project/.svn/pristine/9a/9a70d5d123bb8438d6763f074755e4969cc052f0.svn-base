@@ -1,0 +1,18 @@
+package com.ezenrent.rent.service;
+
+import com.ezenrent.main.ServiceInterface;
+import com.ezenrent.rent.dao.RentDAO;
+import com.ezenrent.rent.dao.RentDAOImpl;
+
+public class RentMyViewServiceImpl implements ServiceInterface {
+
+	@Override
+	public Object service(Object obj) throws Exception {
+		//System.out.println("RentMyViewService.service().....");
+		
+		
+		RentDAO dao = new RentDAOImpl();
+		return dao.myView((String) obj);
+	}
+
+}

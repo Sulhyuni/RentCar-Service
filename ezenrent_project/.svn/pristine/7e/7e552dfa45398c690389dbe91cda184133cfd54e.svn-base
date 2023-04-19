@@ -1,0 +1,5 @@
+package com.ezenrent.car.dao;
+
+public class CarDAOImpl {
+
+}

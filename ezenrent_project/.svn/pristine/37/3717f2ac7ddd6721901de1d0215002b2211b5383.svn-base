@@ -1,0 +1,154 @@
+package com.ezenrent.member.controller;
+
+import java.util.List;
+
+import com.ezenrent.main.Execute;
+import com.ezenrent.main.Main;
+import com.ezenrent.member.service.MemberDeleteServiceImpl;
+import com.ezenrent.member.service.MemberListServiceImpl;
+import com.ezenrent.member.service.MemberUpdateServiceImpl;
+import com.ezenrent.member.service.MemberViewPwServiceImpl;
+import com.ezenrent.member.service.MemberViewServiceImpl;
+import com.ezenrent.member.service.MemberWriteServiceImpl;
+import com.ezenrent.member.vo.MemberVO;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.MemberPrint;
+import com.ezenrent.util.io.Out;
+
+public class MemberController {
+	public void execute() {
+		while(true) {
+			try {
+				if(Main.login.getGradeNo() != 9) {
+					Out.error("=", 20, "관리자만 접근 가능합니다.");
+					return;
+				} else {
+					Out.title("=", 20, "회원관리");
+					System.out.println(" 1.회원리스트 2.회원정보보기 3.회원정보수정 4.회원삭제 0.이전메뉴 ");
+					Out.line("=", 50);
+				}
+				
+				switch(In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+				case "1" : // 리스트					
+					Out.title("=", 20, "회원검색");				
+					System.out.println(" 1.전체리스트 2.아이디 3.이름 4.연락처 5.회원상태 0.이전메뉴");
+					Out.line("=", 50);
+					MemberVO listVO = new MemberVO();
+					switch(In.getString("회원 목록을 가져올 검색 조건을 선택 해 주세요.")) {
+					case "1" :
+						break;
+					case "2" :
+						listVO.setId(In.getString("아이디 입력"));
+						break;
+					case "3" :
+						listVO.setName(In.getString("이름 입력"));
+						break;
+					case "4" :
+						listVO.setTel(In.getString("연락처 뒷번호 4자리 입력"));
+						break;
+					case "5" :
+						listVO.setStatus(In.getString("상태 입력 (정상,휴면,강퇴,탈퇴)"));
+						break;
+					case "0" :
+						return;
+					default :
+						break;
+					}					
+					@SuppressWarnings("unchecked") 
+					List<MemberVO> list = (List<MemberVO>) Execute.run(new MemberListServiceImpl(), listVO);
+					MemberPrint.print(list);
+					break;
+				case "2" : // 보기
+					MemberVO viewVO = new MemberVO();
+					String str = In.getString("정보를 확인할 회원의 아이디를 입력 해 주세요.");
+					viewVO.setId(str);
+					viewVO = (MemberVO) Execute.run(new MemberViewServiceImpl(), str);
+					MemberPrint.print(viewVO);
+					break;
+				case "3" : // 수정
+//					MemberVO updateVO = new MemberVO();
+//					str = In.getString("수정 할 회원의 아이디를 입력 해 주세요.");
+//					updateVO = (MemberVO) Execute.run(new MemberViewServiceImpl(), str);
+//					MemberPrint.print(updateVO);
+//					updateVO.setId(str);
+//					updateVO(updateVO);
+//					int result = (Integer) Execute.run(new MemberUpdateServiceImpl(), updateVO);
+//					if (result == 1) {
+//						System.out.println("\n 수정이 되었습니다.");
+//					} else {
+//						System.out.println("\n 수정이 되지 않았습니다.");
+//						}
+//					
+					break;
+				case "4" : // 삭제
+					str = In.getString("\n삭제 할 회원 아이디 입력");
+					MemberVO deleteVO = new MemberVO();
+					String id = Main.login.getId(); // admin
+					String inPw = In.getString("\n관리자 비밀번호를 입력 해 주세요."); // 2222
+					deleteVO = (MemberVO) Execute.run(new MemberViewPwServiceImpl(), id);
+					if(inPw.equals(deleteVO.getPw())) {
+						int result = (Integer) Execute.run(new MemberDeleteServiceImpl(), str);					
+						if(result == 1) {
+							System.out.println("\n ■ "+str + "님의 모든 정보가 삭제 되었습니다.");
+						} else {
+							System.out.println("\n삭제 실패. 아이디를 다시 한 번 확인 해 주세요.");
+						}
+					} else {
+						System.out.println("\n ** 삭제가 되지 않았습니다. 비밀번호를 확인 해 주세요.");
+					}
+					break;
+				case "0" : // 이전메뉴 
+					return;
+				default :
+					System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+					System.out.println("■ 1~5번, 0번중에 선택 해 주세요. ");
+					break;
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} // end of try~catch
+		} // end of while
+	} // end of execute()
+	
+	
+	public Integer updateInfo(MemberVO vo) throws Exception {
+		while (true) {
+			System.out.println();
+			Out.line("=", 30);
+			System.out.println(" 1.연락처 2.이메일 3.면허번호");
+			System.out.println(((Main.isAdmin())?" 4.회원등급 5.회원상태 ":" ")
+					+ "0.수정완료");		
+			Out.line("=", 30);
+			switch(In.getString("수정 할 항목을 선택 해 주세요.")) {
+			case "1" : // 연락처
+				vo.setTel(In.getString("수정 할 연락처 (01x-xxxx-xxxx)"));
+				break;
+			case "2" : // 이메일
+				vo.setEmail(In.getString("수정 할 이메일 (nnn@nnn.nnn)"));			
+				break;
+			case "3" : // 면허번호
+				vo.setLicenseNo(In.getString("면허번호 (xx-xx-xxxxxx-xx)"));
+				break;
+			case "0" : // 수정완료
+				int result = (int) Execute.run(new MemberUpdateServiceImpl(), vo);
+				return result;
+			case "4" : // 회원등급
+				if(Main.isAdmin()) {
+				vo.setGradeNo(Integer.parseInt(In.getString("등급 변경 (1,9)")));
+				}
+				break;
+			case "5" : // 회원상태
+				if(Main.isAdmin()) {
+				vo.setStatus(In.getString("상태 변경 (정상,휴면,강퇴,탈퇴)"));
+				}
+				break;
+			default :
+				System.out.println("\n■ 잘못 입력 하셨습니다.");
+				System.out.println("■ 1~"
+								+((Main.login.getGradeNo()==1)?"3":"5")+"번, 0번중에 선택 해 주세요. ");
+				break;
+			} // end of switch		
+		} // end of while
+	} // end of updateVO()
+} // end of class

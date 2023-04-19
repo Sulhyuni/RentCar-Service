@@ -1,0 +1,11 @@
+package com.ezenrent.member.controller;
+
+public class MemberThread implements Runnable{
+
+	@Override
+	public void run() {
+		
+		
+	}
+
+}

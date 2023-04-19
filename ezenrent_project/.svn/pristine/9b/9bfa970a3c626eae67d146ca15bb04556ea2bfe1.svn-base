@@ -1,0 +1,16 @@
+package com.ezenrent.member.service;
+
+import com.ezenrent.main.ServiceInterface;
+import com.ezenrent.member.dao.MemberDAO;
+import com.ezenrent.member.dao.MemberDAOImpl;
+
+public class MemberListServiceImpl implements ServiceInterface {
+
+	@Override
+	public Object service(Object obj) throws Exception {
+		System.out.println("MemberListServiceImpl.service() 실행");
+		MemberDAO dao = new MemberDAOImpl();
+		return dao.list();
+	}
+
+}

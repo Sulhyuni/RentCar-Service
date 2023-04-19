@@ -1,0 +1,16 @@
+package com.ezenrent.util.io;
+
+import java.util.List;
+
+import com.ezenrent.member.vo.MemberVO;
+
+public class MemberPrint {
+	
+	public static void print(List<MemberVO> list) {
+		System.out.println();
+		Out.line("=", 30);
+		System.out.println(" ");
+	}
+	
+
+}

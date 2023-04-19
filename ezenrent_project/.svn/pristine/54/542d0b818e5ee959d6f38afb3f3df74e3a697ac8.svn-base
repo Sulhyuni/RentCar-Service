@@ -1,0 +1,352 @@
+package com.ezenrent.member.dao;
+
+import java.util.ArrayList;
+import java.sql.Date;
+import java.util.List;
+import com.ezenrent.member.vo.LoginVO;
+import com.ezenrent.member.vo.MemberVO;
+import com.ezenrent.util.db.DAO;
+import com.ezenrent.util.db.DB;
+
+public class MemberDAOImpl extends DAO implements MemberDAO {
+
+	@Override
+	public LoginVO login(String id, String pw) throws Exception {
+		LoginVO loginVO = null;
+		try {
+			con = DB.getConnection();			
+			String sql = " select m.id, m.name, m.email, m.gradeNo, g.gradeName, m.status, m.regDate "
+					+ " from member m, grade g "
+					+ " where (m.id = ? and m.pw = ?) and (m.gradeNo = g.gradeNo)";			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, pw);			
+			rs = pstmt.executeQuery();			
+			if(rs != null && rs.next()) {
+				loginVO = new LoginVO();
+				loginVO.setId(rs.getString("id"));
+				loginVO.setName(rs.getString("name"));
+				loginVO.setEmail(rs.getString("email"));
+				loginVO.setGradeNo(rs.getInt("gradeNo"));
+				loginVO.setGradeName(rs.getString("gradeName"));
+				loginVO.setStatus(rs.getString("status"));
+				loginVO.setRegDate(rs.getString("regDate"));
+			}		
+			return loginVO;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+	} // end of login()
+	
+	@Override
+	public List<MemberVO> list(MemberVO vo) throws Exception {
+		List<MemberVO> list = null;		
+		try {
+			con = DB.getConnection();
+			String condition = " ";
+			if(vo.getId() != null ) condition = "id =? and";
+			else if(vo.getName() != null ) condition = "name =? and";
+			else if(vo.getTel() != null ) condition = "tel LIKE ? and";
+			else if(vo.getStatus() != null) condition = "status = ? and";
+			String sql = " SELECT m.id, m.name, m.gender, m.tel, m.status, m.gradeNo, g.gradeName, m.regDate "
+					+ " FROM grade g, member m "
+					+ " WHERE " + condition + "(m.gradeNo = g.gradeNo) "
+					+ " ORDER BY id ASC";		
+			pstmt = con.prepareStatement(sql);
+			String data = null;
+			if(condition != " ") {
+				if(vo.getId() != null) data = vo.getId();
+				else if(vo.getName() != null) data = vo.getName();
+				else if(vo.getTel() != null) data = "%"+vo.getTel()+"%";
+				else if(vo.getStatus() != null) data = vo.getStatus();
+				pstmt.setString(1, data);
+			} 			
+			rs = pstmt.executeQuery();
+			System.out.println("5. 실행");			
+			if(rs != null) {
+				while (rs.next()) {
+					if(list == null) list = new ArrayList<MemberVO>();
+				MemberVO listVO = new MemberVO();	
+				listVO.setId(rs.getString("id"));
+				listVO.setName(rs.getString("name"));
+				listVO.setGender(rs.getString("gender"));
+				listVO.setTel(rs.getString("tel"));
+				listVO.setStatus(rs.getString("status"));
+				listVO.setGradeNo(rs.getInt("gradeNo"));
+				listVO.setGradeName(rs.getString("gradeName"));
+				listVO.setRegDate(rs.getString("regDate"));
+				list.add(listVO);
+				}
+			}
+			return list;			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+	} // end of list()
+
+	@Override
+	public MemberVO view(String str) throws Exception {
+		MemberVO viewVO = null;
+		try {
+			con = DB.getConnection();
+			System.out.println("1. 드라이버확인 + 2.연결");
+			
+			String sql = "SELECT m.id, m.name, m. pw, m.gender, to_char(m.birth, 'yyyy-mm-dd') birth, "
+					+ " m.tel, m.email, m.licenseNo, to_char(m.regDate, 'yyyy-mm-dd HH24:MI:SS') regDate, m.status, m.gradeNo, g.gradeName "
+					+ " FROM grade g, member m "
+					+ " WHERE id = ? and (m.gradeNo = g.gradeNo) ";
+			System.out.println("3. sql - " + sql);
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, str);			
+			rs = pstmt.executeQuery();			
+			if(rs != null && rs.next()) {
+				viewVO = new MemberVO();
+				viewVO.setId(rs.getString("id"));
+				viewVO.setName(rs.getString("name"));
+				viewVO.setPw(rs.getString("pw"));
+				viewVO.setGender(rs.getString("gender"));
+				viewVO.setBirth(rs.getString("birth"));
+				viewVO.setTel(rs.getString("tel"));
+				viewVO.setEmail(rs.getString("email"));
+				viewVO.setLicenseNo(rs.getString("licenseNo"));
+				viewVO.setRegDate(rs.getString("regDate"));
+				viewVO.setStatus(rs.getString("status"));
+				viewVO.setGradeNo(rs.getInt("gradeNo"));
+				viewVO.setGradeName(rs.getString("gradeName"));
+			}
+			return viewVO;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+	} // end of view()
+	
+	public MemberVO viewPw(String pw) throws Exception {
+		MemberVO viewPwVO = null;
+		try {
+			con = DB.getConnection();
+			
+			String sql = "SELECT pw"
+					+ " FROM member "
+					+ " WHERE id = ? ";			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, pw);	
+			rs = pstmt.executeQuery();			
+			if(rs != null && rs.next()) {
+				viewPwVO = new MemberVO();
+				viewPwVO.setPw(rs.getString("pw"));
+			}
+			return viewPwVO;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+	} // end of viewPw()
+
+	@Override
+	public Integer write(MemberVO vo) throws Exception {
+		int result = 0;
+		try {
+			con = DB.getConnection();
+			
+			String sql = " INSERT INTO member (id, pw, name, gender, birth, tel, email, licenseNo) "
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getPw());
+			pstmt.setString(3, vo.getName());
+			pstmt.setString(4, vo.getGender());
+			pstmt.setString(5, vo.getBirth());
+			pstmt.setString(6, vo.getTel());
+			pstmt.setString(7, vo.getEmail());
+			pstmt.setString(8, vo.getLicenseNo());						
+			result = pstmt.executeUpdate();
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	} // end of write()
+
+	@Override
+	public Integer update(MemberVO vo) throws Exception {
+		int result = 0;
+		try {
+			con = DB.getConnection();		
+			String sql = " update member set "
+					+ " tel =?, email=?, licenseNo=?, gradeNo=?, status =?, "
+					+ " regdate = ? "
+					+ " where id =? ";	
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getTel());
+			pstmt.setString(2, vo.getEmail());
+			pstmt.setString(3, vo.getLicenseNo());
+			pstmt.setInt(4, vo.getGradeNo());
+			pstmt.setString(5, vo.getStatus());
+			pstmt.setString(6, vo.getRegDate());
+			pstmt.setString(7, vo.getId());			
+			result = pstmt.executeUpdate();
+			return result;		
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	} // end of update()
+	
+	public Integer updatePw(MemberVO vo) throws Exception {
+		int result = 0;
+		try {
+			con = DB.getConnection();			
+			String sql = " update member set "
+					+ " pw = ? "
+					+ " where id =? ";		
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getPw());
+			pstmt.setString(2, vo.getId());			
+			result = pstmt.executeUpdate();			
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	} // end of updatePw()
+	
+	public Integer updateDate(String id) throws Exception {
+		try {
+			con = DB.getConnection();			
+			String sql = "update member set regdate = sysdate where id = ? ";
+			pstmt = con.prepareStatement(sql);	
+			pstmt.setString(1, id);			
+			return pstmt.executeUpdate();	
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	}
+	@Override
+	public Integer rest(Date date) throws Exception {
+		int result = 0;
+		try {
+			con = DB.getConnection();	
+			String sql = " update member set "
+					+ " status = '휴면' "
+					+ " WHERE regdate < ?  AND status = '정상' ";			
+			pstmt = con.prepareStatement(sql);	
+			pstmt.setDate(1, date);
+			System.out.println(result);
+			return result;			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	} // end of rest()
+	
+	public Integer wakeUp(MemberVO vo) throws Exception {
+		int result = 0;
+		try {
+			con = DB.getConnection();		
+			String sql = " update member set "
+					+ " status =  '정상' "
+					+ " where id = ? and name =? and pw =? ";			
+			pstmt = con.prepareStatement(sql);	
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getName());
+			pstmt.setString(3, vo.getPw());		
+			result = pstmt.executeUpdate();					
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	}
+	
+	@Override
+ 	public Integer delete(String str) throws Exception {
+		int result = 0;
+		try {
+			con = DB.getConnection();		
+			String sql = " delete from member "
+					+ " where id = ? ";
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, str);			
+			result = pstmt.executeUpdate();
+			System.out.println("5. 실행");					
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt);
+		}
+	} // end of delete()
+	
+	public LoginVO findId(LoginVO vo) throws Exception {
+		LoginVO findIdVO = null;
+		try {
+			con = DB.getConnection();					
+			String sql = " select id from member where name =? and email = ? ";			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getName());
+			pstmt.setString(2, vo.getEmail());			
+			rs = pstmt.executeQuery();			
+			if(rs != null && rs.next()) {
+				findIdVO = new LoginVO();
+				findIdVO.setId(rs.getString("id"));
+			}
+			return findIdVO;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+	} // end of findId()
+	
+	public MemberVO findPw(MemberVO vo) throws Exception {
+		MemberVO findPwVO = null;
+		try {
+			con = DB.getConnection();			
+			String sql = " select pw from member where id=? and name =? and email = ? ";			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getName());
+			pstmt.setString(3, vo.getEmail());			
+			rs = pstmt.executeQuery();			
+			if(rs != null && rs.next()) {
+				findPwVO = new MemberVO();
+				findPwVO.setPw(rs.getString("pw"));
+			}
+			return findPwVO;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			DB.close(con, pstmt, rs);
+		}
+	} // end of findPw()
+	
+} // end of class

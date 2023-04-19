@@ -1,0 +1,58 @@
+package com.ezenrent.util.io;
+
+import java.util.List;
+
+import com.ezenrent.main.Main;
+import com.ezenrent.member.vo.MemberVO;
+
+public class MemberPrint {
+
+	public static void print(List<MemberVO> list) {
+		System.out.println();
+		Out.line("=", 85);
+		System.out.println(" 아이디    이름    성별         연락처        상태   등급번호     등급명         최근접속일");
+		Out.line("=", 85);
+
+		if (list == null || list.size() == 0) {
+			System.out.println("\n** 검색 결과가 없습니다.");
+			return;
+		}
+		
+		for(int i = 0; i < list.size(); i++) {
+			MemberVO vo = list.get(i);
+			System.out.print(" "+vo.getId()+"\t"+ vo.getName()+"\t"+vo.getGender()+"\t"
+					+vo.getTel()+"\t"+vo.getStatus()+"\t"+vo.getGradeNo()
+					+"\t"+vo.getGradeName()+"\t"+vo.getRegDate());
+			System.out.println();
+		}
+		Out.line("=", 85);
+	}
+
+	public static void print(MemberVO vo) {
+		if (vo == null) {
+			System.out.println("\n** 존재하지 않는 회원입니다.");
+			return;
+		}
+		System.out.println();
+		Out.title("=", 15, vo.getName()+"님의 회원정보");
+		System.out.println();
+		System.out.println(" - 아이디 : " + vo.getId());
+		System.out.println(" - 이름 : " + vo.getName());
+		System.out.println(" - 성별 : " + vo.getGender());
+		System.out.println(" - 생년월일 : " + vo.getBirth());
+		System.out.println(" - 연락처 : " + vo.getTel());
+		System.out.println(" - 이메일 : " + vo.getEmail());
+		System.out.println(" - 면허번호 : " + vo.getLicenseNo());
+		if (Main.isAdmin()) {
+			System.out.println(" - 최근접속일 : " + vo.getRegDate());
+			System.out.println(" - 상태 : " + vo.getStatus());
+			System.out.println(" - 등급번호 : " + vo.getGradeNo());
+			System.out.println(" - 등급이름 : " + vo.getGradeName());
+		}
+		if (Main.login.getGradeNo() == 1) {
+		System.out.println("\n ■ 정보 변경을 원하시면 [3.내정보수정]을 선택 해 주세요.");
+		}
+		System.out.println();
+		Out.line("=", 50);
+	}
+}

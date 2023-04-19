@@ -1,0 +1,138 @@
+package com.ezenrent.member.controller;
+
+import com.ezenrent.car.controller.CarController;
+import com.ezenrent.main.Execute;
+import com.ezenrent.main.Main;
+import com.ezenrent.member.service.MemberLoginServiceImpl;
+import com.ezenrent.member.vo.LoginVO;
+import com.ezenrent.notice.controller.NoticeController;
+import com.ezenrent.rent.controller.RentController;
+import com.ezenrent.review.controller.ReviewController;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.Out;
+
+public class LoginController {
+	public void execute() {
+		while(true) {
+			try {
+				if(Main.login == null) {
+					Out.title("=", 16, "My 메뉴");
+					System.out.println(" 1.로그인 2.회원가입 3.아이디찾기 4.비밀번호찾기 0.이전메뉴");
+					Out.line("=", 45);
+					
+				} else if (Main.login.getGradeNo() == 1) {
+					Out.title("=", 10, "My 메뉴");
+					System.out.println(" 1.로그아웃 2.내정보보기 3.내정보수정");
+					System.out.println(" 4.대여내역 5.회원탈퇴 0.이전메뉴");
+					Out.line("=", 30);	
+					
+				} else if (Main.login.getGradeNo() == 9) {
+					Out.title("=", 15, "관리자 메뉴");
+					System.out.println(" 1.로그아웃 2.내정보보기 3.내정보수정 0.이전메뉴");
+					System.out.println(" 4.공지사항관리 5.차량관리 6.대여관리 7.리뷰관리 8.회원관리");
+					Out.line("=", 50);					
+					
+				}
+				
+				// 비회원 My메뉴
+				if(Main.login == null) {
+					switch(In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+					case "1": // 로그인
+						LoginVO vo = new LoginVO();
+						System.out.print("\n아이디 ▶ ");
+						vo.setId(In.getString());
+						System.out.print("비밀번호 ▶ ");
+						vo.setPw(In.getString());
+						LoginVO loginVO = (LoginVO) Execute.run(new MemberLoginServiceImpl(), vo);
+						if(loginVO == null) {
+							System.out.println("\n** 입력하신 정보가 없습니다.");
+							System.out.println("** 아이디나 비밀번호를 다시 확인 해 주세요.");
+						} else {
+							Main.login = loginVO;
+							System.out.println("\n  ■ "+ loginVO.getName()+"님! 환영합니다.");
+							System.out.println("  ■ "+ loginVO.getGradeName()+" 권한으로 로그인 되었습니다.");
+						}
+						break;
+					case "2": // 회원가입
+						break;
+					case "3": // 아이디찾기
+						break;
+					case "4": // 비밀번호 찾기
+						break;
+					case "0": // 이전메뉴
+						return;
+					default :
+						System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+						System.out.println("■ 1~4번, 0번중에 선택 해 주세요. ");
+					} // end of switch
+				
+					// 일반회원 My메뉴
+					// 1.로그아웃 2.내정보보기 3.내정보수정 4.대여내역 5.회원탈퇴 0.이전메뉴
+				} else if (Main.login.getGradeNo() == 1) {
+					 switch(In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+					 case "1": //로그아웃
+						 Main.login = null;
+						 System.out.println("\n  ■ 로그아웃 되었습니다.");
+						 break;
+					 case "2": // 내정보보기
+						 break;
+					 case "3": // 내정보수정
+						 break;
+					 case "4": // 대여내역
+						 break;
+					 case "5": // 회원탈퇴
+						 break;
+					 case "0": // 이전메뉴
+						 return;
+					 default :
+							System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+							System.out.println("■ 1~6번, 0번중에 선택 해 주세요. ");
+					 }
+					
+					// 관리자 메뉴
+					// 1.로그아웃 2.내정보보기 3.내정보수정 0.이전메뉴
+					// 4.공지사항관리 5.차량관리 6.대여관리 7.리뷰관리 8.회원관리
+				} else if  (Main.login.getGradeNo() == 9) {
+					switch(In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+					 case "1": // 로그아웃
+						 Main.login = null;
+						 System.out.println("\n** 로그아웃 되었습니다.");
+						 break;
+					 case "2": // 내정보보기
+						 break;
+					 case "3": // 내정보수정
+						 break;
+					 case "4": // 공지사항관리
+						 NoticeController noticeController = new NoticeController();
+						 noticeController.execute();
+						 break;
+					 case "5": // 차량관리
+						 CarController carController = new CarController();
+						 carController.execute();
+						 break;
+					 case "6": // 대여관리
+						 RentController rentController = new RentController();
+						 rentController.execute();
+						 break;
+					 case "7": // 리뷰관리
+						 ReviewController reviewController = new ReviewController();
+						 reviewController.execute();
+						 break;
+					 case "8": // 회원관리
+						 MemberController memberController = new MemberController();
+						 memberController.execute();
+						 break;
+					 case "0": // 이전메뉴
+						 return;
+					 default :
+							System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+							System.out.println("■ 1~6번, 0번중에 선택 해 주세요. ");
+					 }
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} // end of try~catch
+		} // end of while
+	} // end of execute
+} // end of class

@@ -1,0 +1,18 @@
+package com.ezenrent.member.service;
+
+import java.sql.Date;
+
+import com.ezenrent.main.ServiceInterface;
+import com.ezenrent.member.dao.MemberDAO;
+import com.ezenrent.member.dao.MemberDAOImpl;
+
+public class MemberRestServiceImpl implements ServiceInterface{
+
+	@Override
+	public Object service(Object obj) throws Exception {
+//		System.out.println("MemberRestServiceImpl.service() 실행");
+		MemberDAO dao = new MemberDAOImpl();
+		return dao.rest((Date)obj);
+	}
+
+}

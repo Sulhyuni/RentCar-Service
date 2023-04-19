@@ -1,0 +1,22 @@
+package com.ezenrent.car.dao;
+
+import java.util.List;
+
+import com.ezenrent.car.vo.CarVO;
+
+public interface CarDAO {
+	
+	public List<CarVO> list() throws Exception;
+	
+	public List<CarVO> posList() throws Exception;
+	
+	CarVO view(long no) throws Exception;
+
+	int write(CarVO vo) throws Exception;
+
+	int update(CarVO vo) throws Exception;
+
+	int delete(CarVO vo) throws Exception;
+
+
+}

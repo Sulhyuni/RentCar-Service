@@ -1,0 +1,139 @@
+package com.ezenrent.member.controller;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class ConditionCheck {
+	
+	// 길이 범위 확인 하기
+	public static boolean length(String str, int min, int max) {
+		return min <= str.length() && str.length() <= max;
+	}
+
+	// 아이디 형식 체크
+	public static boolean checkId(String id) {	
+		if(!length(id, 4, 20)) {
+			System.out.println("\n ■ 4자 이상 20자 이하로 입력 가능 합니다.");
+			return false;
+		} else if (!isEng(id.charAt(0))) {
+			System.out.println("\n ■ 첫 글자는 영문 대소문자로 입력 가능 합니다.");
+			return false;
+		} else if (possibleEngNum(id)) {
+			System.out.println("\n ■ 아이디는 영문 또는 숫자만 입력 가능 합니다.");
+			return false;
+		} else {
+			return true;
+		}
+	
+	} // end of checkId
+	
+	// 비밀번호 형식 체크
+	public static boolean checkPw(String pw) {
+		return true;
+	} // end of checkPw
+	
+	// 이름 형식 체크
+	public static boolean checkName(String name) {
+		return true;
+	} // end of checkName
+	
+	// 생년월일 형식 체크
+	public static boolean checkBirth(String date) {
+		try {
+			DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.parse(date);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	} // end of checkBirth
+	
+	// 19세 미만 아닌지 확인
+	public static Integer getAge(String birth) {
+		LocalDate birthDate = LocalDate.parse(birth, DateTimeFormatter.ISO_DATE);
+		int birthYear = birthDate.getYear();
+		LocalDate now = LocalDate.now();
+		int currentYear = now.getYear();		
+		return (currentYear - birthYear + 1);
+	} // end of getAge()
+	
+	// 성별 형식 체크
+	public static boolean checkGender(String gender) {
+		return true;
+	} // end of checkGender
+	
+	// 휴대폰번호 형식 체크
+	public static boolean checkTel(String tel) {
+		return true;
+	} // end of checkTel
+	
+	// 이메일 형식 체크
+	public static boolean checkEmail(String email) {
+		return true;
+	} // end of checkEmail
+	
+	// 면허번호 형식 체크
+	public static boolean checkLicenseNo(String LicenseNo) {
+		return true;
+	} // end of LicenseNo
+	
+	// 알파벳인지 확인
+	public static boolean isEng(char ch) {
+		return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z');
+	}
+	
+	// 한글인지 확인
+	public static boolean isKor(char ch) {
+		return '가' <= ch && ch <= '힣';
+	}
+	// 숫자인지 확인
+	public static boolean isNum(char ch) {
+		return '0' <= ch && ch <= '9';
+	}
+	// 특수문자인지 확인
+	public static boolean isSpecialChar(char ch) {
+		return ch == '~' || ch == '!' || ch == '@' || ch == '^' || ch == '*' ||
+			ch == '-' || ch == '_' || ch == '.' || ch == ',' || ch == '?';
+	}
+	// 숫자 포함했는지
+	public static boolean hasNum(String str) {
+		 for(int i = 0; i < str.length(); i++) {
+			 if(isNum(str.charAt(i))) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	// 영어 포함했는지
+	public static boolean hasEng(String str) {
+		for(int i = 0; i < str.length(); i++) {
+			 if(isEng(str.charAt(i))) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	//한글,영어 제외 다른 문자가 있으면 안됨 - 이름
+	public static boolean possibleKorEng(String str) {
+		for(int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			 if(!isKor(ch) && !isEng(ch)) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	// 영어,숫자 제외 다른 문자가 있으면 안됨 - 아이디
+	public static boolean possibleEngNum(String str) {
+		for(int i = 0; i < str.length(); i++) {
+			char ch = str.charAt(i);
+			 if(!isEng(ch) && !isNum(ch)) {
+				 return true;
+			 }
+		 }
+		 return false;
+	}
+	
+}

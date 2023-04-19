@@ -1,0 +1,5 @@
+package com.ezenrent.car.service;
+
+public class CarWriteServiceImpl {
+
+}

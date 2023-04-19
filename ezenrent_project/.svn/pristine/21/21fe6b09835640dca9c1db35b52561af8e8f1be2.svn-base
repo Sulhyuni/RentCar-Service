@@ -1,0 +1,6 @@
+
+package com.ezenrent.notice.service;
+
+public class NoticeWriteServiceImpl {
+
+}

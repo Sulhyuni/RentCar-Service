@@ -1,0 +1,293 @@
+package com.ezenrent.rent.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Scanner;
+
+import com.ezenrent.car.service.CarListServiceImpl;
+import com.ezenrent.car.service.CarPosListServiceImpl;
+import com.ezenrent.car.service.CarViewServiceImpl;
+import com.ezenrent.car.vo.CarVO;
+import com.ezenrent.main.Execute;
+import com.ezenrent.main.Main;
+import com.ezenrent.rent.service.RentDeleteServiceImpl;
+import com.ezenrent.rent.service.RentListServiceImpl;
+import com.ezenrent.rent.service.RentUpdateServiceImpl;
+import com.ezenrent.rent.service.RentViewServiceImpl;
+import com.ezenrent.rent.service.RentWriteServiceImpl;
+import com.ezenrent.rent.vo.RentVO;
+import com.ezenrent.util.io.CarPrint;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.Out;
+import com.ezenrent.util.io.RentPrint;
+
+public class RentController {
+
+	@SuppressWarnings("unchecked")
+	public void execute() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		// 무한루프
+		while (true) {
+			try {
+
+				// 메뉴출력
+
+				if (Main.login == null) {
+					Out.line("=", 35);
+					System.out.println(" 대여하기는 로그인 후 이용 가능합니다.");
+					System.out.println(" 홈으로 이동합니다.");
+					Out.line("=", 35);
+					return;
+				} else {
+					Out.title("=", 15, "대여하기");
+					System.out.println("1.대여리스트 2.대여상세내역 3.예약하기 " 
+					+ " 4.예약수정,추가운전자 등록  5.반납&취소하기  0.이전메뉴");
+					Out.line("=", 41);
+				}
+
+				// 메뉴입력/처리
+				switch (In.getString("메뉴 입력")) {
+				case "1":
+
+					// 대여리스트
+					// 일반회원- 로그인.id와 대여.id 동일한 리스트만 불러온다.
+					// login.id,member.id
+
+					// 관리자- 모든리스트(모든회원,대여가능리스트)를 볼 수 있다.
+					// gradeNo ==9
+					List<RentVO> list = null;
+					RentVO vo = new RentVO();
+					vo.setId(Main.login.getId());
+					if (Main.login.getGradeNo() == 9) {
+						Object result = Execute.run(new RentListServiceImpl(), null);
+						RentPrint.print((List<RentVO>) result);
+						System.out.println("회원의 모든 대여리스트를 불러옵니다.");
+						
+					}else if (Main.login.getId().equals(vo.getId())) {
+						Object result = Execute.run(new RentListServiceImpl(), null);
+						RentPrint.print((List<RentVO>) result);		
+						System.out.println("회원님의 대여리스트를 불러옵니다.");
+						//if(list==null) System.out.println("대여내역이 없습니다.");
+					
+					}
+//					 
+						//test회원대여리스트 조회시
+						//select id from rentVO
+						//where id = test
+						
+					
+
+					// 예약 내역이 없는 회원은 3.예약하기로 이동안내
+
+					break;
+				case "2"://--완료 01.05
+					// 대여상세내역
+					// 대여리스트의 rentNo입력시 대여리스트 컬럼명 + 예약시입력한컬럼 모두 출력한다.
+					RentVO viewVO = new RentVO();
+					long no = Long.parseLong(In.getString("볼 차량 예약번호"));
+					viewVO.setId(Main.login.getId());
+
+					viewVO = (RentVO) Execute.run(new RentViewServiceImpl(), no);
+					//Integer result = (Integer) Execute.run(new RentViewServiceImpl(), viewVO);
+					
+					RentPrint.print(viewVO);
+					
+					
+					break;
+
+				case "3":
+					// 예약하기 write
+    				// 대여가능 리스트를 불러온다
+					//예약 후 carStatus가 '가능'->'불가' 로 변경되어야 한다.
+					
+					RentVO writeVO = new RentVO();
+					CarVO carVO = new CarVO();
+
+					//carStatus가 '가능'인 리스트만 불러온다.
+					List<CarVO> posList = (List<CarVO>) Execute.run(new CarPosListServiceImpl(), null);
+					CarPrint.print(posList);
+
+					// carNo입력, 대여일자,반납일자
+					no = Long.parseLong(In.getString("예약할 차량 선택"));
+					carVO.setCarNo(no);
+					
+					if(carVO.getCarStatus()=="불가" )
+						System.out.println("예약불가능한 차량번호이거나 잘못된 번호 입니다.");
+					else
+					carVO = (CarVO) Execute.run(new CarViewServiceImpl(), no);
+					System.out.println(carVO);
+
+					// 3-1 writeVO(writeVO)
+					// 보험선택 1.만21세 2.만26세 /1.20만원 2.30만원 3.50만원 선택 후 db저장
+					// *보험은 선택하는걸로 할지, 30만원 고정값 넣을지 추후 결정하기로 함.
+					writeVO.setCarNo(no);
+					writeVO.setId(Main.login.getId());
+					System.out.println("\n+대여장소와 반납장소는 동일합니다.+");
+					writeVO.setPlace(In.getString("대여장소"));
+					//대여시작일
+					writeVO.setRentalDate(In.getString("대여시작일(yyyy-MM-dd) : "));
+					sdf.setLenient(false);
+					sdf.parse(writeVO.getRentalDate());
+					//대여반납일
+					writeVO.setReturnDate(In.getString("반납일(yyyy-MM-dd) : "));
+					sdf.setLenient(false);
+					sdf.parse(writeVO.getReturnDate());
+					// 보험선택 1.21세 2.26세
+					writeVO.setInsurance(In.getString("보험선택"));
+					Integer result = (Integer) Execute.run(new RentWriteServiceImpl(), writeVO);
+					
+					
+					// totalFee = carPrice * 대여일수(대여시작일-대여종료일) +insurance(1.or2.)
+					Long totalFee = null;
+					System.out.println("총 렌트료 :" + totalFee);
+					Out.line("=", 41);
+					System.out.println("예약되었습니다.");
+//					System.out.println("예약하시겠습니까?  1.예 2.이전메뉴");		
+				
+					
+					carVO = new CarVO();
+					CarVO carStatus = null;
+					 
+					
+						
+
+					// 예약하면 rentNo생성된다.
+//					switch (In.getString("메뉴입력")) {
+//					case "1":
+////						System.out.println("아래 정보로 예약되었습니다.");
+////						viewVO=(RentVO) Execute.run(new RentViewServiceImpl(), writeVO.getRentNo());
+////						RentPrint.print(viewVO);
+//						break;
+//					case "2":
+//						System.out.println("이전메뉴로 돌아갑니다.");
+//
+//						return;
+//
+//					default:
+//						break;
+//					}
+//					Out.line("=", 41);
+//
+//					Execute.run(new RentWriteServiceImpl(), writeVO);
+					break;
+
+				case "4":
+					// 예약수정,추가운전자등록 update
+					// 대여일,반납일수정, 추가운전자등록
+					// 추가운전자(이름,생년월일, 면허번호 )정보 입력
+					
+					// 수정할 글 항목번호입력
+					no = Long.parseLong(In.getString("수정할 차량예약 번호"));
+					RentVO updateVO = (RentVO) Execute.run(new RentViewServiceImpl(), no);
+					RentPrint.print(updateVO);
+					if(!Main.login.getId().equals(updateVO.getId())) {
+						Out.error("*", 20, "본인글만 수정 가능합니다.");
+					throw new Exception("본인글만 수정가능합니다.");
+					}
+					else
+					// 대여일,반납일수정, 추가운전자등록(이름,생년월일,면허번호)
+					updateVO(updateVO);
+					updateVO.setRentNo(no);
+					Execute.run(new RentUpdateServiceImpl(), updateVO);
+					// }
+
+					break;
+				case "5":
+					// 예약 취소
+					// 취소,반납시 대여정보만 삭제처리. carStatus가 '가능'으로 변경하도록 한다.
+					// 예약 취소는 대여시작일 이전일 경우에만 가능.
+ 
+					// 취소,반납 할 회원 대여리스트의 rentNo 입력
+					no = Long.parseLong(In.getString("예약 취소 할 차량번호"));
+					RentVO deleteVO = new RentVO();
+					deleteVO.setRentNo(no);
+					deleteVO.setId(Main.login.getId());
+					Execute.run(new RentListServiceImpl(), deleteVO);
+					Execute.run(new RentDeleteServiceImpl(), deleteVO);
+
+					break;
+				case "0":
+					// 이전메뉴
+					System.out.println("이전메뉴로 돌아갑니다.");
+
+					return;
+
+				default:
+					System.out.println("잘못된 메뉴 입력");
+					System.out.println("다시 입력 해주세요.");
+					break;
+
+				}// end of switch
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				Out.error("*", 20, "잘못된 날짜 형식입니다");
+			} // end of try~catch
+
+		} // end of while
+	}// end of execute
+
+	// 4-1 수정항목
+	private void updateVO(RentVO vo) {
+		while (true) {
+			try {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				
+			System.out.println("1.대여일 2.반납일 3.운전자 등록 0.완료");
+			switch (In.getString("수정 항목 입력")) {
+			case "1":				
+				vo.setRentalDate(In.getString("대여일(yyyy-MM-dd) :"));
+				sdf.setLenient(false);
+				sdf.parse(vo.getRentalDate());
+				break;
+			case "2":
+				vo.setReturnDate(In.getString("반납일(yyyy-MM-dd) :"));
+			sdf.setLenient(false);
+				sdf.parse(vo.getReturnDate());
+				break;
+			case "3":
+				vo.setAddDriver(In.getString("이름"));
+				vo.setAddBirth(In.getString("생년월일"));
+				vo.setAddLicense(In.getString("면허번호"));
+
+				break;
+			case "0":
+				vo.setId(Main.login.getId());
+				System.out.println("수정완료 되었습니다.");
+
+				return;
+
+			default:
+				Out.error("=", 20, "잘못입력했습니다.");
+				break;
+			}
+			}catch (Exception e) {
+			Out.error("*", 20, "잘못된 날짜 형식입니다");
+			e.printStackTrace();			
+			}
+
+		} // end of while
+
+	}// end of update vo
+	private void insuranceVO(RentVO vo) {
+		while(true) {
+			System.out.println("1.만21세이상 2.만26세이상");
+			switch (In.getString("보험선택")) {
+			case "1":
+				long insuranceYounger = 30000;
+				long insuranceOlder= 10000;
+				
+				break;
+			case "2":
+				
+				break;
+
+			default:
+				break;
+			}
+			
+		}//end ofwhile
+		
+	}//end of insuranceVO 
+
+}// end of class

@@ -1,0 +1,6 @@
+package com.ezenrent.notice.dao;
+
+public interface NoticeDAO {
+	
+
+}

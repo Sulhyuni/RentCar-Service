@@ -1,0 +1,55 @@
+package com.ezenrent.main;
+
+import com.ezenrent.member.controller.LoginController;
+import com.ezenrent.member.vo.LoginVO;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.Out;
+
+public class Main {
+
+	public static LoginVO login = null;
+	
+	public static void main(String[] args) {
+		
+		while(true) {
+			if(login == null) {
+				System.out.println();
+				Out.line("=", 35);
+				System.out.println("  로그인이 되어있지 않습니다.");
+				System.out.println("  [5.My메뉴]로 이동하여 로그인을 해주세요.");
+				Out.line("=", 35);
+			} else {
+				System.out.println("\n  ■ "+ login.getId()+"님, 무엇을 도와드릴까요?");
+			}
+			
+			Out.title("=", 13, "Ezen Rent");
+			System.out.println(" 1.공지사항 2.차량보기 3.대여하기 4.이용후기 5.My메뉴 0.종료");
+			Out.line("=", 41);
+		
+			switch (In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+			case "1": // 공지관리 컨트롤러
+				break;
+			case "2": // 차량관리 컨트롤러
+				break;
+			case "3": // 대여관리 컨트롤러
+				break;
+			case "4": // 리뷰관리 컨트롤러
+				break;
+			case "5": // 로그인 컨트롤러
+				LoginController loginController = new LoginController();
+				loginController.execute();
+				break;
+			case "0": // 시스템종료
+				System.out.println("\n★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★");
+				System.out.println("★  안녕히 가세요. 다음에 또 만나요!  ★");
+				System.out.println("★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★☆★");
+				System.exit(0);
+			default:
+				break;
+				
+			}
+		}
+
+	}
+
+}

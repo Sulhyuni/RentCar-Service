@@ -1,0 +1,249 @@
+package com.ezenrent.rent.dao;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ezenrent.car.vo.CarVO;
+import com.ezenrent.main.Main;
+import com.ezenrent.rent.vo.RentVO;
+import com.ezenrent.util.db.DAO;
+import com.ezenrent.util.db.DB;
+
+public class RentDAOImpl extends DAO implements RentDAO {
+
+	// list
+	@Override
+	public List<RentVO> list() throws Exception {
+		System.out.println("RentDAO.list().....");
+
+	 
+
+		try {
+			List<RentVO> list = null;
+			// 1.드라이버확인, 연결
+			con = DB.getConnection();
+			System.out.println("1.드라이버확인+2.연결확인");
+			 
+			
+			
+			//모든회원 대여리스트 -관리자
+			// 3.sql
+			String sql = ("select  c.carNo, m.id, m.name, m.tel,c.carBrand,c.carModel,c.carOption, "
+					+ " r.rentalDate, r.returnDate, r.addDriver,r.place,c.carStatus "
+					+ " from  rental r, car c ,member m"
+					+ " where c.carNo=r.carNo and m.id = r.id ");
+			
+			System.out.println("3.sql -" + sql);			
+			
+			// 4.실행객체&데이터저장			
+			pstmt = con.prepareStatement(sql);
+			//pstmt.setString(1, listVO.getId());
+			System.out.println("4.실행객체&데이터저장");			
+			
+			//5.실행
+			rs = pstmt.executeQuery();
+			System.out.println("5.실행완료 rs-" +rs);
+			
+			//6.표시,저장
+			if (rs != null) {
+				while (rs.next()) {
+					if(list ==null) list = new ArrayList<RentVO>();
+					RentVO listVO = new RentVO();
+						//rs->listVO
+						listVO.setCarNo(rs.getLong("carNo"));
+						listVO.setId(rs.getString("id"));
+						listVO.setName(rs.getString("name"));
+						listVO.setTel(rs.getString("tel"));
+						listVO.setCarBrand(rs.getString("carBrand"));
+						listVO.setCarModel(rs.getString("carModel"));						
+						listVO.setCarOption(rs.getString("carOption"));
+						listVO.setRentalDate(rs.getString("rentalDate"));
+						listVO.setReturnDate(rs.getString("returnDate"));
+						listVO.setAddDriver(rs.getString("addDriver"));
+						listVO.setPlace(rs.getString("place"));
+						listVO.setCarStatus(rs.getString("carStatus"));
+						
+						list.add(listVO);
+					}
+				
+					System.out.println("6.표시,저장완료");
+				
+			}
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("리스트 DB처리 중 에러 발생");
+		} finally {
+			// 7.닫기
+			DB.close(con, pstmt, rs);
+			System.out.println("7.닫기완료");
+		}
+	}//end of list
+
+//예약 상세 보기 view
+	@Override
+	public RentVO view(long no) throws Exception {
+		System.out.println("RentDAO.view().....");
+
+		RentVO viewVO = null;
+		try {
+			// 본인 예약건만 볼 수 있다
+			// carNo, carModel,carType,carFuel, carOption, carBrand, carPrice,
+			// id, name, tel, --추가입력부분: rentalDate,
+			// returnDate,addDriver,insurance,place,totalFee
+
+			con = DB.getConnection();
+			System.out.println("1드라이브확인2. 연결확인");
+			// 3.
+			String sql = " select c.carNo, m.id, m.name, m.tel, c.carBrand, c.carModel, c.carType, c.carOption, c.carfuel, "
+					+ " r.totalFee, r.insurance, r.rentalDate, r.returnDate, r.addDriver, r.place "
+					+ " from rental r, car c, member m "
+					+ " where c.carNo = ? and c.carNo=r.carNo and m.id = r.id ";					
+			System.out.println("3.sql- "+sql);
+
+			// 4.실행객체 생성
+			pstmt = con.prepareStatement(sql);
+			pstmt.setLong(1, no);
+			System.out.println("4.실행객체,데이터세팅");
+
+			// 5.실행
+			rs = pstmt.executeQuery();
+			System.out.println("5.실행 rs - " +rs);
+
+			// 6.저장
+			if (rs != null && rs.next()) {
+				viewVO = new RentVO();
+				// rs->vo
+				viewVO.setCarNo(rs.getLong("carNo"));
+				viewVO.setId(rs.getString("id"));
+				viewVO.setName(rs.getString("Name"));
+				viewVO.setTel(rs.getString("tel"));
+				viewVO.setCarBrand(rs.getString("carBrand"));
+				viewVO.setCarModel(rs.getString("carModel"));
+				viewVO.setCarType(rs.getString("carType"));
+				viewVO.setCarOption(rs.getString("carOption"));
+				viewVO.setCarFuel(rs.getString("carFuel"));
+				viewVO.setTotalFee(rs.getLong("totalFee"));
+				viewVO.setInsurance(rs.getString("insurance"));
+				viewVO.setRentalDate(rs.getString("rentalDate"));
+				viewVO.setReturnDate(rs.getString("returnDate"));
+				viewVO.setAddDriver(rs.getString("addDriver"));
+				viewVO.setPlace(rs.getString("place"));		
+			} // end if
+			System.out.println("6.데이터저장");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("보기 DB처리 중 에러 발생");
+		} finally {
+			// 7.닫기
+			DB.close(con, pstmt, rs);
+			System.out.println("7.닫기완료");
+		}
+		return viewVO;
+	}
+
+	// 예약하기 write
+	@Override
+	public Integer write(RentVO vo) throws Exception {
+		System.out.println("RentDAO.write().....");
+		// 연령별 ,면책금별 보험료 변수 선언
+
+		long younger = 30000;
+		long older = 10000;
+		long twenty = 10000;
+		long thirt = 20000;
+		long fifty = 30000;
+
+		Integer result = null;
+		try {
+			con=DB.getConnection();
+			System.out.println("1드라이브확인2. 연결확인");
+			
+			String sql = " insert into rental (rentNo, carNo, id,  rentalDate, "
+					+ " returnDate,addDriver,insurance,place )  "
+					+ " values(rentNo_seq.nextval, ?, ?, ?, ? , ?, ?, ?) "; 		 
+			System.out.println("3.sql-" +sql);
+			
+			//4.실행객체 &데이터저장
+			pstmt = con.prepareStatement(sql);
+			
+			
+			pstmt.setLong(2, vo.getCarNo());
+			pstmt.setString(3, vo.getId());
+			pstmt.setString(4, vo.getRentalDate());
+			pstmt.setString(5, vo.getReturnDate());
+			pstmt.setString(6, vo.getAddDriver());
+			pstmt.setString(7, vo.getInsurance());
+			pstmt.setString(8, vo.getPlace());
+			
+			System.out.println("4.실행개체+데이터생성");
+			
+			//5.
+			result = pstmt.executeUpdate();
+			System.out.println("5.실행" +result);
+
+			//6.저장,표시
+			if(result ==1)
+				System.out.println("6.예약 됨.");
+			else
+				System.out.println("6.예약 실패");			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("등록 DB처리 중 에러 발생");
+		} finally {
+			DB.close(con, pstmt);
+			System.out.println("7.닫기성공");
+		}
+		return result;
+	}
+
+	@Override
+	public Integer update(RentVO vo) throws Exception {
+		System.out.println("RentDAO.update().....");
+
+		Integer result = null;
+		try {
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("수정 DB처리 중 에러 발생");
+		} finally {
+
+			// 7.닫기
+			DB.close(con, pstmt, rs);
+			System.out.println("7.닫기완료");
+		}
+		return null;
+	}
+
+	@Override
+	public Integer delete(RentVO vo) throws Exception {
+		System.out.println("RentDAO.delete().....");
+
+		Integer result = null;
+		try {
+			con=DB.getConnection();
+			System.out.println("1.드라이브확인+2.연결확인");
+			//sql
+			String sql = " delete from rental "
+					+ " where id = 'test2' and carNo =3 ";
+System.out.println("3.sql - " + sql);
+			
+			
+			
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("삭제 DB처리 중 에러 발생");
+		} finally {
+			// 7.닫기
+			DB.close(con, pstmt, rs);
+			System.out.println("7.닫기완료");
+
+		}
+		return null;
+	}
+
+}

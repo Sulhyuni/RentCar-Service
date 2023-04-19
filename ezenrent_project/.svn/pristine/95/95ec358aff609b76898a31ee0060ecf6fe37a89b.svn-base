@@ -1,0 +1,55 @@
+package com.ezenrent.member.controller;
+
+import com.ezenrent.main.Execute;
+import com.ezenrent.main.Main;
+import com.ezenrent.member.service.MemberDeleteServiceImpl;
+import com.ezenrent.member.service.MemberListServiceImpl;
+import com.ezenrent.member.service.MemberUpdateServiceImpl;
+import com.ezenrent.member.service.MemberViewServiceImpl;
+import com.ezenrent.member.service.MemberWriteServiceImpl;
+import com.ezenrent.util.io.In;
+import com.ezenrent.util.io.Out;
+
+public class MemberController {
+	public void execute() {
+		while(true) {
+			try {
+				if(Main.login.getGradeNo() != 9) {
+					Out.error("=", 20, "관리자만 접근 가능합니다.");
+					return;
+				} else {
+					Out.title("=", 20, "회원관리");
+					System.out.println(" 1.회원리스트 2.회원정보보기 3.회원정보등록 4.회원정보수정 5.회원삭제 0.이전메뉴");
+					Out.line("=", 50);
+				}
+				
+				switch(In.getString("원하시는 항목의 번호를 선택 해 주세요")) {
+				case "1" : // 리스트
+					Execute.run(new MemberListServiceImpl(), null);
+					break;
+				case "2" : // 보기
+					Execute.run(new MemberViewServiceImpl(), null);
+					break;
+				case "3" : // 등록
+					Execute.run(new MemberWriteServiceImpl(), null);
+					break;
+				case "4" : // 수정
+					Execute.run(new MemberUpdateServiceImpl(), null);
+					break;
+				case "5" : // 삭제
+					Execute.run(new MemberDeleteServiceImpl(), null);
+					break;
+				case "0" : // 이전메뉴
+					return;
+				default :
+					System.out.println("\n■ 잘못 입력 하셨습니다.     ");
+					System.out.println("■ 1~5번, 0번중에 선택 해 주세요. ");
+					break;
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}

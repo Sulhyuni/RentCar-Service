@@ -1,0 +1,19 @@
+package com.ezenrent.member.service;
+
+import com.ezenrent.main.ServiceInterface;
+import com.ezenrent.member.dao.MemberDAO;
+import com.ezenrent.member.dao.MemberDAOImpl;
+
+public class MemberLoginServiceImpl implements ServiceInterface{
+	@Override
+	public Object service(Object obj) throws Exception {
+		System.out.println("MemberLoginServiceImpl.service() 실행");
+		Object[]objs = (Object[]) obj;
+		String id = (String) objs[0];
+		String pw = (String) objs[1];
+		int inc = (int) objs[2];
+		MemberDAO dao = new MemberDAOImpl();
+		if(inc == 1) dao.updateDate(id);
+		return dao.login(id, pw);
+	}
+}

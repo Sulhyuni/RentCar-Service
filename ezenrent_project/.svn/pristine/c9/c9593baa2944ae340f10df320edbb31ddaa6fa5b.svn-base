@@ -1,0 +1,27 @@
+package com.ezenrent.util.db;
+
+public class DB {
+	// DB 정보
+	private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
+	private static final String URL = "jdbc:oracle:thin:@192.168.0.120:1521:xe";
+	private static final String ID = "rentcar";
+	private static final String PW = "rentcar";
+
+	// 드라이버 확인을 저장하는 변수 선언
+	private static boolean checkDriver = false;
+
+	// 한번만 드라이버가 있는 확인하는 메서드
+	static {
+		System.out.println("DB 클래스 static 초기화블럭 진행 -----");
+		try {
+			Class.forName(DRIVER);
+			checkDriver = true;
+			System.out.println("드라이버 확인완료");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("드라이버 확인 요망");
+		}
+
+	}
+}
